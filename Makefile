@@ -1,18 +1,7 @@
 .PHONY: deploy optimize clear-cache
 
-# Git o'zgarishlarni yuborish (Ishlatish: make push m="Xabarni yozing")
-push:
-	@if [ -z "$(m)" ]; then \
-		echo "❌ Xato: Commit xabarini yozing! Masalan: make push m='fix bug'"; \
-		exit 1; \
-	fi
-	git add .
-	git commit -m "$(m)"
-	git push origin main
-	@echo "✅ O'zgarishlar Git-ga muvaffaqiyatli yuborildi!"
-
 # Git o'zgarishlarni yuborish (Interaktiv xabar so'rash bilan)
-push-in:
+push:
 	@echo "📝 Commit xabarini kiriting:"
 	@read msg; \
 	if [ -z "$$msg" ]; then \
@@ -55,45 +44,55 @@ deploy:
 	
 	@echo "✅ Deployment finished successfully!"
 
-# Just optimization
-optimize:
-	@echo "⚡ Optimizing application..."
-	php artisan config:cache
-	php artisan route:cache
-	php artisan view:cache
-	php artisan event:cache
-	php artisan optimize
-	@echo "✨ Optimization done!"
+# docker commands
+up: ## Docker containerlarni ishga tushirish
+	docker compose up -d
 
-# Clear all cache (for debugging)
-clear-cache:
-	@echo "🧹 Clearing all cache..."
-	php artisan config:clear
-	php artisan route:clear
-	php artisan view:clear
-	php artisan cache:clear
-	@echo "🧼 Cache cleared!"
+down: ## Docker containerlarni to'xtatish
+    cd ../; docker compose down
 
-# Database migrations
-migrate:
-	@echo "🗄️ Running migrations..."
-	php artisan migrate
-	@echo "✅ Migrations completed!"
+restart: ## Docker containerlarni qayta ishga tushirish
+    cd ../; docker compose restart
 
-# Fresh database with migrations
-fresh:
-	@echo "🗄️ Refreshing database..."
-	php artisan migrate:fresh
-	@echo "✅ Database refreshed!"
+logs: ## Docker loglarni ko'rish
+    cd ../; docker compose logs -f
 
-# Seed database
-seed:
-	@echo "🌱 Seeding database..."
-	php artisan db:seed
-	@echo "✅ Database seeded!"
+ps: ## Docker containerlarni ko'rish
+    cd ../; docker ps
 
-# Fresh database with seeders
-fresh-seed:
+bash: ## Docker containerga bash kirish
+    cd ../; docker exec -it course-app bash
+
+db: ## Docker databasega bash kirish
+    cd ../; docker exec -it course-db bash
+
+optimize: ## Laravel optimize qilish
+    cd ../; docker exec course-app php artisan optimize
+
+optimize-clear: ## Laravel optimize ni tozalash
+    cd ../; docker exec course-app php artisan optimize:clear
+
+migrate: ## Laravel migratsiyalarni ishga tushirish
+    cd ../; docker exec course-app php artisan migrate
+
+migrate-fresh: ## Laravel migratsiyalarni tozalash va qayta ishga tushirish
+    cd ../; docker exec course-app php artisan migrate:fresh
+
+# npm commands
+npm-install: ## npm paketlarini o'rnatish
+    npm install
+
+npm-update: ## npm paketlarini yangilash
+    npm update
+
+npm-run-dev: ## npm dev rejimida ishga tushirish
+    npm run dev
+
+npm-run-prod: ## npm prod rejimida ishga tushirish
+    npm run prod
+
+npm-run-build: ## npm build rejimida ishga tushirish
+    npm run build
 	@echo "🗄️🌱 Fresh database with seeders..."
 	php artisan migrate:fresh --seed
 	@echo "✅ Database refreshed and seeded!"

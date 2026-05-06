@@ -13,16 +13,21 @@
     <link rel="icon" href="{{ asset('images/2.png') }}">
 
     <!-- Preload Google Fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+    <link rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+    </noscript>
 
     <!-- Leaflet.js CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
     <!-- Leaflet MarkerCluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-    
+
     <!-- TailwindCSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -34,30 +39,33 @@
         [x-cloak] {
             display: none !important;
         }
-        
+
         /* Leaflet map responsive styles */
-        #map, #filterMapEl {
+        #map,
+        #filterMapEl {
             height: 400px;
             width: 100%;
             border-radius: 0.5rem;
             overflow: hidden;
         }
-        
+
         @media (max-width: 768px) {
-            #map, #filterMapEl {
+
+            #map,
+            #filterMapEl {
                 height: 300px;
             }
         }
-        
+
         .leaflet-popup-content-wrapper {
             border-radius: 0.5rem;
         }
-        
+
         .center-popup .leaflet-popup-content {
             margin: 0;
             line-height: 1.4;
         }
-        
+
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -77,12 +85,15 @@
             0% {
                 transform: translate(0px, 0px) scale(1);
             }
+
             33% {
                 transform: translate(30px, -50px) scale(1.1);
             }
+
             66% {
                 transform: translate(-20px, 20px) scale(0.9);
             }
+
             100% {
                 transform: translate(0px, 0px) scale(1);
             }
@@ -93,6 +104,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -104,6 +116,7 @@
                 opacity: 0;
                 transform: translateX(-30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -115,6 +128,7 @@
                 opacity: 0;
                 transform: translateX(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -225,6 +239,7 @@
 
         /* Responsive adjustments */
         @media (max-width: 640px) {
+
             .animate-slide-in-left,
             .animate-slide-in-right {
                 animation: fade-in 0.6s ease-out;
@@ -251,7 +266,7 @@
     </main>
 
     <!-- Footer -->
-    @unless(request()->routeIs('chat.*') || request()->routeIs('signin') || request()->routeIs('signup'))
+    @unless (request()->routeIs('chat.*') || request()->routeIs('signin') || request()->routeIs('signup'))
         <x-footer />
     @endunless
 
@@ -268,23 +283,27 @@
             </svg>
         </button>
 
-        <!-- Chat Quiz -->
-        <a href="{{ route('chat.quiz') }}" title="RIASEC testi"
-            class="bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </a>
+        @unless (request()->routeIs('chat.*'))
+            <!-- Chat Quiz -->
+            <a href="{{ route('chat.quiz') }}" title="RIASEC testi"
+                class="bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </a>
+        @endunless
 
-        <!-- Chat -->
-        <a href="{{ route('chat.chat') }}" title="Chat"
-            class="bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 bg-gradient-to-r from-primary-600 to-accent-600 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-        </a>
+        @unless (request()->routeIs('chat.*'))
+            <!-- Chat -->
+            <a href="{{ route('chat.chat') }}" title="Chat"
+                class="bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 bg-gradient-to-r from-primary-600 to-accent-600 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+            </a>
+        @endunless
     </div>
 
     <!-- Success/Error Messages -->
@@ -305,8 +324,7 @@
                 class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 shadow-lg">
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor"
-                            viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                 clip-rule="evenodd" />
@@ -347,8 +365,7 @@
                 class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 shadow-lg">
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="currentColor"
-                            viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                 clip-rule="evenodd" />
@@ -433,15 +450,14 @@
 
     <!-- Leaflet.js -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- Leaflet MarkerCluster -->
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <!-- Scripts Stack -->
     @stack('scripts')
-    
+
     <!-- User Online Status Tracking -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -457,24 +473,26 @@
                     credentials: 'same-origin'
                 }).catch(() => {});
             };
-            
+
             // Update immediately on page load
             updateOnlineStatus();
-            
+
             // Update every 2 minutes
             setInterval(updateOnlineStatus, 2 * 60 * 1000);
-            
+
             // Update on user activity (with debounce)
             let activityTimeout;
             const handleActivity = () => {
                 clearTimeout(activityTimeout);
                 activityTimeout = setTimeout(updateOnlineStatus, 5000);
             };
-            
+
             ['click', 'scroll', 'keypress', 'mousemove'].forEach(event => {
-                document.addEventListener(event, handleActivity, { passive: true });
+                document.addEventListener(event, handleActivity, {
+                    passive: true
+                });
             });
-            @endauth
+        @endauth
         });
     </script>
 

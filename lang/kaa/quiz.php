@@ -7,7 +7,7 @@ return [
     // Hero Section
     'hero' => [
         'badge' => 'RIASEC Test',
-        'title' => 'Kasbqa yo\'naltirıwshı<br>psixologik test',
+        'title' => 'Kasbqa yo\'naltirıwshı psixologik test',
         'description' => '24 ta sorawǵa «Ha» ya «No\'q» dep jawap beriń. Nátijada sizge eń mos yo\'naltırıwlar foizlarda shıǵadı.',
     ],
 

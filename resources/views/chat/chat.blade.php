@@ -3,440 +3,274 @@
 
     @php $maxMsgs = \App\Models\ChatSession::MAX_MESSAGES; @endphp
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <!-- Mobile sidebar overlay -->
+        <div x-data="{ sidebarOpen: false }" 
+             x-show="sidebarOpen" 
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
+             @click="sidebarOpen = false">
+        </div>
 
-        .ai-md p {
-            margin-bottom: .5rem;
-        }
-
-        .ai-md p:last-child {
-            margin-bottom: 0;
-        }
-
-        .ai-md h1,
-        .ai-md h2,
-        .ai-md h3 {
-            color: #f1f5f9;
-            margin: .8rem 0 .35rem;
-            font-size: .95rem;
-        }
-
-        .ai-md ul,
-        .ai-md ol {
-            margin: .35rem 0 .35rem 1.25rem;
-        }
-
-        .ai-md li {
-            margin-bottom: .3rem;
-        }
-
-        .ai-md strong {
-            color: #f1f5f9;
-        }
-
-        .ai-md a {
-            color: #3b82f6;
-            text-decoration: underline;
-        }
-
-        .ai-md code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .79rem;
-            background: rgba(255, 255, 255, .07);
-            padding: 1px 5px;
-            border-radius: 4px;
-            color: #93c5fd;
-        }
-
-        .ai-md pre {
-            background: rgba(0, 0, 0, .4);
-            border: 1px solid #374151;
-            border-radius: 8px;
-            padding: .85rem;
-            overflow-x: auto;
-            margin: .5rem 0;
-        }
-
-        .ai-md pre code {
-            background: none;
-            padding: 0;
-            color: #d1d5db;
-        }
-
-        .ai-md table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: .82rem;
-            margin: .5rem 0;
-        }
-
-        .ai-md th,
-        .ai-md td {
-            padding: .4rem .65rem;
-            border: 1px solid #374151;
-            text-align: left;
-        }
-
-        .ai-md th {
-            background: rgba(255, 255, 255, .04);
-            color: #f9fafb;
-        }
-
-        .ai-md hr {
-            border: none;
-            border-top: 1px solid #374151;
-            margin: .75rem 0;
-        }
-
-        .center-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            background: rgba(59, 130, 246, .12);
-            border: 1px solid rgba(59, 130, 246, .2);
-            border-radius: 6px;
-            font-size: .72rem;
-            color: #3b82f6;
-            margin: 2px 2px 2px 0;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        /* Light mode styles */
-        .light-mode .bg-slate-950 {
-            background-color: #ffffff !important;
-        }
-
-        .light-mode .bg-slate-800 {
-            background-color: #f8fafc !important;
-        }
-
-        .light-mode .bg-slate-800\/50 {
-            background-color: rgba(248, 250, 252, 0.5) !important;
-        }
-
-        .light-mode .bg-slate-900 {
-            background-color: #ffffff !important;
-        }
-
-        .light-mode .bg-slate-700\/10 {
-            background-color: rgba(241, 245, 249, 0.1) !important;
-        }
-
-        .light-mode .bg-slate-700\/30 {
-            background-color: rgba(241, 245, 249, 0.3) !important;
-        }
-
-        .light-mode .bg-slate-800\/50 {
-            background-color: rgba(248, 250, 252, 0.5) !important;
-        }
-
-        .light-mode .text-slate-300 {
-            color: #475569 !important;
-        }
-
-        .light-mode .text-slate-100 {
-            color: #1e293b !important;
-        }
-
-        .light-mode .text-slate-500 {
-            color: #64748b !important;
-        }
-
-        .light-mode .text-slate-400 {
-            color: #64748b !important;
-        }
-
-        .light-mode .border-slate-700 {
-            border-color: #e2e8f0 !important;
-        }
-
-        .light-mode .border-slate-600 {
-            border-color: #cbd5e1 !important;
-        }
-
-        .light-mode .border-slate-500\/20 {
-            border-color: rgba(59, 130, 246, 0.2) !important;
-        }
-
-        .light-mode .bg-blue-500\/10 {
-            background-color: rgba(59, 130, 246, 0.1) !important;
-        }
-
-        .light-mode .bg-blue-500\/20 {
-            background-color: rgba(59, 130, 246, 0.2) !important;
-        }
-
-        .light-mode .text-blue-500 {
-            color: #3b82f6 !important;
-        }
-
-        .light-mode .border-blue-500\/22 {
-            border-color: rgba(59, 130, 246, 0.22) !important;
-        }
-
-        .light-mode .border-blue-500 {
-            border-color: #3b82f6 !important;
-        }
-
-        .light-mode .bg-emerald-500\/15 {
-            background-color: rgba(16, 185, 129, 0.15) !important;
-        }
-
-        .light-mode .text-emerald-500 {
-            color: #10b981 !important;
-        }
-
-        .light-mode .bg-red-500\/8 {
-            background-color: rgba(239, 68, 68, 0.08) !important;
-        }
-
-        .light-mode .border-red-500\/15 {
-            border-color: rgba(239, 68, 68, 0.15) !important;
-        }
-
-        .light-mode .text-red-400 {
-            color: #ef4444 !important;
-        }
-
-        .light-mode .bg-gradient-to-r {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
-        }
-
-        /* Dark mode - default (slate colors already work) */
-        .dark-mode .ai-md h1,
-        .dark-mode .ai-md h2,
-        .dark-mode .ai-md h3 {
-            color: #f1f5f9;
-        }
-
-        .dark-mode .ai-md strong {
-            color: #f1f5f9;
-        }
-
-        .dark-mode .ai-md a {
-            color: #3b82f6;
-        }
-
-        .dark-mode .center-tag {
-            background: rgba(59, 130, 246, .12);
-            border: 1px solid rgba(59, 130, 246, .2);
-            color: #3b82f6;
-        }
-    </style>
-
-    {{-- Overlay --}}
-    <div class="hidden fixed inset-0 bg-black/55 z-[39] md:hidden" id="ov" onclick="closeSB()"></div>
-
-    <div class="font-inter bg-slate-950 h-screen flex overflow-hidden text-slate-300 dark-mode" id="chat-container">
-
-        {{-- ═══════════════ SIDEBAR ═══════════════ --}}
-        <aside
-            class="w-[280px] bg-slate-800 border-r border-slate-700 flex flex-col flex-shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] z-40 md:relative fixed top-0 left-0 h-full -translate-x-full md:translate-x-0"
-            id="sb">
-            <div class="p-4 border-b border-slate-700 flex items-center gap-2.5">
-                <div
-                    class="w-8.5 h-8.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-base flex-shrink-0">
-                    🤖</div>
-                <span class="text-sm font-bold text-slate-100">{{ __('chat.sidebar.title') }}</span>
-            </div>
-
-            <button
-                class="mx-4 my-3 w-[calc(100%-2rem)] px-4 py-2.5 flex items-center gap-2 bg-blue-500/10 border border-blue-500/22 rounded-lg text-blue-500 text-sm font-semibold transition-all duration-180 hover:bg-blue-500/20 hover:border-blue-500"
-                onclick="newChat()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2.5">
-                    <path d="M12 5v14M5 12h14" />
-                </svg>
-                {{ __('chat.sidebar.new_chat') }}
-            </button>
-
-            <div class="px-4 py-2 text-[10px] font-bold tracking-widest uppercase text-slate-500">{{ __('chat.sidebar.history') }}</div>
-
-            <div class="flex-1 overflow-y-auto p-2" id="sess-list">
-                @forelse($sessions as $s)
-                    <div class="p-2.5 px-3 rounded-lg cursor-pointer transition-colors duration-150 mb-0.5 border border-transparent hover:bg-white/4 {{ $currentSession?->id == $s->id ? 'bg-blue-500/10 border-blue-500/20' : '' }}"
-                        id="si-{{ $s->id }}" onclick="loadSess({{ $s->id }})">
-                        <div class="text-xs font-medium text-slate-100 truncate mb-1">{{ $s->title }}</div>
-                        <div class="flex items-center gap-1 text-[10px] text-slate-500">
-                            <span
-                                class="text-[9px] font-bold px-1 py-0.5 rounded {{ $s->status === 'active' ? 'bg-emerald-500/15 text-emerald-500' : 'bg-white/6 text-slate-500' }}">
-                                {{ $s->status === 'active' ? 'Faol' : 'Yopiq' }}
-                            </span>
-                            <span>{{ $s->message_count }}/{{ $maxMsgs }}</span>
-                            <span>{{ $s->created_at->format('d.m') }}</span>
+        <div class="flex h-screen">
+            <!-- Sidebar -->
+            <aside x-data="{ sidebarOpen: false }" 
+                   :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                   class="fixed inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0">
+                
+                <!-- Sidebar Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
                         </div>
-                        @if ($s->lastMessage)
-                            <div class="text-[11px] text-slate-500 truncate mt-0.5">
-                                {{ Str::limit($s->lastMessage->content, 48) }}</div>
-                        @endif
-                    </div>
-                @empty
-                    <div id="sess-empty" class="p-6 text-center text-xs text-slate-500">
-                        {{ __('chat.sidebar.no_sessions') }}
-                    </div>
-                @endforelse
-            </div>
-        </aside>
-
-        {{-- ═══════════════ MAIN ═══════════════ --}}
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-
-            <!-- Topbar -->
-            <div class="p-3 bg-slate-800/50 border-b border-slate-700 flex items-center gap-3 flex-shrink-0">
-                <button class="flex text-slate-300 p-1 items-center md:hidden" onclick="openSB()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="3" y1="12" x2="21" y2="12" />
-                        <line x1="3" y1="18" x2="21" y2="18" />
-                    </svg>
-                </button>
-                <div class="flex-1 min-w-0">
-                    <div class="text-sm font-semibold text-slate-100 truncate" id="tb-title">
-                        {{ $currentSession?->title ?? __('chat.topbar.title_default') }}</div>
-                    <div class="text-xs text-slate-500 mt-0.5" id="tb-sub">
-                        {{ $currentSession ? $currentSession->message_count . '/' . $maxMsgs . ' ' . __('chat.topbar.subtitle_with_count') : __('chat.topbar.subtitle') }}
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 w-28 flex-shrink-0">
-                    <div class="flex-1 h-0.5 bg-slate-700 rounded-sm overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-sm transition-all duration-300"
-                            id="prog-fill"
-                            style="width:{{ $currentSession ? round(($currentSession->message_count / $maxMsgs) * 100) : 0 }}%">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('chat.sidebar.title') }}</h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">AI Assistant</p>
                         </div>
                     </div>
-                    <span class="text-[10px] text-slate-500 whitespace-nowrap font-mono"
-                        id="prog-txt">{{ $currentSession?->message_count ?? 0 }}/{{ $maxMsgs }}</span>
-                </div>
-            </div>
-
-            <!-- To'lganlik banneri -->
-            <div class="hidden p-2 bg-red-500/8 border-b border-red-500/15 text-sm text-red-400 items-center gap-2 flex-shrink-0 {{ $currentSession?->isFull() ? 'flex' : '' }}"
-                id="full-banner">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                {{ __('chat.full_banner.message', ['count' => $maxMsgs]) }}
-                <button onclick="newChat()" class="text-blue-500 underline text-xs ml-1">
-                    {{ __('chat.full_banner.new_chat') }}
-                </button>
-            </div>
-
-            {{-- Messages --}}
-            <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-3.5 scroll-smooth" id="msgs">
-
-                {{-- Qidiruv indikatori --}}
-                <div class="hidden p-2 px-3 bg-blue-500/8 border border-blue-500/15 rounded-lg text-sm text-blue-500 items-center gap-2 mb-2 animate-fadeUp"
-                    id="search-indicator">
-                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
-                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.15s"></div>
-                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.3s"></div>
-                    <span id="search-text">{{ __('chat.search.indicator') }}</span>
-                </div>
-
-                @if ($messages->isEmpty())
-                    <div class="flex-1 flex flex-col items-center justify-center text-center gap-3 p-8 animate-fadeUp"
-                        id="empty-state">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-r from-blue-500/12 to-purple-500/12 border border-blue-500/18 rounded-xl flex items-center justify-center text-2xl">
-                            💬</div>
-                        <h3 class="text-base font-semibold text-slate-100">{{ __('chat.empty.greeting') }}</h3>
-                        <p class="text-xs text-slate-500 max-w-[300px] leading-relaxed">{{ __('chat.empty.description') }}</p>
-                        <div class="flex flex-wrap gap-1 justify-center mt-1">
-                            <button
-                                class="px-3.5 py-1.5 bg-slate-800/50 border border-slate-600 rounded-full text-xs text-slate-300 cursor-pointer transition-all duration-150 hover:border-blue-500 hover:text-blue-500 hover:bg-blue-500/6"
-                                onclick="fillIn(this.textContent)">{{ __('chat.empty.suggestions.math_courses') }}</button>
-                            <button
-                                class="px-3.5 py-1.5 bg-slate-800/50 border border-slate-600 rounded-full text-xs text-slate-300 cursor-pointer transition-all duration-150 hover:border-blue-500 hover:text-blue-500 hover:bg-blue-500/6"
-                                onclick="fillIn(this.textContent)">{{ __('chat.empty.suggestions.english_learning') }}</button>
-                            <button
-                                class="px-3.5 py-1.5 bg-slate-800/50 border border-slate-600 rounded-full text-xs text-slate-300 cursor-pointer transition-all duration-150 hover:border-blue-500 hover:text-blue-500 hover:bg-blue-500/6"
-                                onclick="fillIn(this.textContent)">{{ __('chat.empty.suggestions.programming_courses') }}</button>
-                            <button
-                                class="px-3.5 py-1.5 bg-slate-800/50 border border-slate-600 rounded-full text-xs text-slate-300 cursor-pointer transition-all duration-150 hover:border-blue-500 hover:text-blue-500 hover:bg-blue-500/6"
-                                onclick="fillIn(this.textContent)">Arzon o'quv markazlar</button>
-                            <button
-                                class="px-3.5 py-1.5 bg-slate-800/50 border border-slate-600 rounded-full text-xs text-slate-300 cursor-pointer transition-all duration-150 hover:border-blue-500 hover:text-blue-500 hover:bg-blue-500/6"
-                                onclick="fillIn(this.textContent)">Samarqandda IT kurslari</button>
-                            <button
-                                class="px-3.5 py-1.5 bg-slate-800/50 border border-slate-600 rounded-full text-xs text-slate-300 cursor-pointer transition-all duration-150 hover:border-blue-500 hover:text-blue-500 hover:bg-blue-500/6"
-                                onclick="fillIn(this.textContent)">{{ __('chat.empty.suggestions.best_region') }}</button>
-                        </div>
-                    </div>
-                @else
-                    @foreach ($messages as $m)
-                        <div class="flex gap-2.5 animate-fadeUp {{ $m->role === 'user' ? 'flex-row-reverse' : '' }}">
-                            <div
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 font-mono {{ $m->role === 'user' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' : 'bg-slate-800/50 border border-slate-600 text-blue-500' }}">
-                                {{ $m->role === 'user' ? 'S' : 'AI' }}</div>
-                            <div class="max-w-[74%] flex flex-col {{ $m->role === 'user' ? 'items-end' : '' }}">
-                                <div
-                                    class="px-4 py-3 rounded-[14px] text-sm leading-relaxed {{ $m->role === 'user' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-br-sm' : 'bg-slate-800/50 border border-slate-600 text-slate-300 rounded-bl-sm' }}">
-                                    @if ($m->role === 'assistant')
-                                        <div class="ai-md">{!! \Illuminate\Support\Str::markdown($m->content) !!}</div>
-                                    @else
-                                        {{ $m->content }}
-                                    @endif
-                                </div>
-                                <div class="text-[10px] text-slate-500 mt-1 px-0.5">
-                                    {{ $m->created_at->format('H:i') }}</div>
-                            </div>
-                        </div>
-                    @endforeach
-                @endif
-            </div>
-
-            {{-- Input --}}
-            <div class="p-4 bg-slate-800/50 border-t border-slate-600 flex-shrink-0">
-                <div
-                    class="flex gap-1.5 items-end bg-slate-950 border border-slate-600 rounded-[14px] px-3.5 py-2.5 transition-colors duration-200 focus-within:border-blue-500">
-                    <textarea id="inp"
-                        class="flex-1 bg-transparent border-none outline-none text-slate-100 text-sm leading-relaxed resize-none min-6 max-32 p-0"
-                        placeholder="{{ __('chat.search.placeholder') }}" rows="1"></textarea>
-                    <button
-                        class="w-9 h-9 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 transition-all duration-180 shadow-lg shadow-blue-500/28 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/42 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
-                        id="send-btn" onclick="send()">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                            <line x1="22" y1="2" x2="11" y2="13" />
-                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    <button @click="sidebarOpen = false" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
-                <div class="flex justify-between items-center mt-2 px-0.5 text-xs text-slate-500">
-                    <span><kbd
-                            class="bg-slate-950 border border-slate-600 rounded px-1 py-0.5 font-mono text-[9px] text-slate-300">Enter</kbd>
-                        {{ __('chat.input.send_btn') }} · <kbd
-                            class="bg-slate-950 border border-slate-600 rounded px-1 py-0.5 font-mono text-[9px] text-slate-300">Shift+Enter</kbd>
-                        {{ __('chat.input.keyboard_shortcut') }}</span>
-                    <span id="char-count" class="font-mono">0/2000</span>
+
+                <!-- New Chat Button -->
+                <div class="p-4">
+                    <button onclick="newChat()" class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span class="font-medium">{{ __('chat.sidebar.new_chat') }}</span>
+                    </button>
+                </div>
+
+                <!-- Sessions List -->
+                <div class="flex-1 overflow-y-auto px-4 pb-4">
+                    <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">{{ __('chat.sidebar.history') }}</h3>
+                    <div class="space-y-2" id="sess-list">
+                        @forelse($sessions as $s)
+                            <div class="group cursor-pointer rounded-lg p-3 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 {{ $currentSession?->id == $s->id ? 'bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700' : 'border border-transparent' }}"
+                                 id="si-{{ $s->id }}" onclick="loadSess({{ $s->id }})">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $s->title }}</p>
+                                        <div class="flex items-center mt-1 space-x-2">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $s->status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' }}">
+                                                {{ $s->status === 'active' ? 'Faol' : 'Yopiq' }}
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $s->message_count }}/{{ $maxMsgs }}</span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $s->created_at->format('d.m') }}</span>
+                                        </div>
+                                        @if ($s->lastMessage)
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">{{ Str::limit($s->lastMessage->content, 48) }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div id="sess-empty" class="text-center py-8">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ __('chat.sidebar.no_sessions') }}</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col">
+                <!-- Header -->
+                <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <!-- Mobile menu button -->
+                            <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </button>
+                            
+                            <div>
+                                <h1 class="text-xl font-semibold text-gray-900 dark:text-white" id="tb-title">
+                                    {{ $currentSession?->title ?? __('chat.topbar.title_default') }}
+                                </h1>
+                                <p class="text-sm text-gray-500 dark:text-gray-400" id="tb-sub">
+                                    {{ $currentSession ? $currentSession->message_count . '/' . $maxMsgs . ' ' . __('chat.topbar.subtitle_with_count') : __('chat.topbar.subtitle') }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <!-- Progress indicator -->
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-300" 
+                                         id="prog-fill"
+                                         style="width: {{ $currentSession ? round(($currentSession->message_count / $maxMsgs) * 100) : 0 }}%"></div>
+                                </div>
+                                <span class="text-sm text-gray-500 dark:text-gray-400 font-mono" id="prog-txt">
+                                    {{ $currentSession?->message_count ?? 0 }}/{{ $maxMsgs }}
+                                </span>
+                            </div>
+
+                            <!-- Theme toggle -->
+                            <button onclick="toggleTheme()" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Full banner -->
+                @if ($currentSession?->isFull())
+                    <div class="bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 px-6 py-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <p class="text-sm text-red-800 dark:text-red-200">
+                                    {{ __('chat.full_banner.message', ['count' => $maxMsgs]) }}
+                                </p>
+                            </div>
+                            <button onclick="newChat()" class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline">
+                                {{ __('chat.full_banner.new_chat') }}
+                            </button>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Messages area -->
+                <div class="flex-1 overflow-y-auto px-6 py-6" id="msgs">
+                    <!-- Search indicator -->
+                    <div id="search-indicator" class="hidden mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex space-x-1">
+                                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                            </div>
+                            <span class="text-sm text-blue-800 dark:text-blue-200" id="search-text">{{ __('chat.search.indicator') }}</span>
+                        </div>
+                    </div>
+
+                    @if ($messages->isEmpty())
+                        <!-- Empty state -->
+                        <div class="flex-1 flex flex-col items-center justify-center text-center py-12" id="empty-state">
+                            <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ __('chat.empty.greeting') }}</h3>
+                            <p class="text-gray-600 dark:text-gray-400 max-w-md mb-8">{{ __('chat.empty.description') }}</p>
+                            
+                            <!-- Suggestion buttons -->
+                            <div class="flex flex-wrap gap-2 justify-center max-w-2xl">
+                                <button onclick="fillIn(this.textContent)" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    {{ __('chat.empty.suggestions.math_courses') }}
+                                </button>
+                                <button onclick="fillIn(this.textContent)" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    {{ __('chat.empty.suggestions.english_learning') }}
+                                </button>
+                                <button onclick="fillIn(this.textContent)" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    {{ __('chat.empty.suggestions.programming_courses') }}
+                                </button>
+                                <button onclick="fillIn(this.textContent)" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    Arzon o'quv markazlar
+                                </button>
+                                <button onclick="fillIn(this.textContent)" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    Samarqandda IT kurslari
+                                </button>
+                                <button onclick="fillIn(this.textContent)" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    {{ __('chat.empty.suggestions.best_region') }}
+                                </button>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Messages -->
+                        @foreach ($messages as $m)
+                            <div class="flex {{ $m->role === 'user' ? 'justify-end' : 'justify-start' }} mb-4 animate-fade-in">
+                                <div class="flex items-start space-x-3 max-w-3xl {{ $m->role === 'user' ? 'flex-row-reverse space-x-reverse' : '' }}">
+                                    <!-- Avatar -->
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center {{ $m->role === 'user' ? 'bg-gradient-to-r from-indigo-500 to-purple-600' : 'bg-gray-200 dark:bg-gray-700' }}">
+                                        <span class="text-sm font-medium {{ $m->role === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-300' }}">
+                                            {{ $m->role === 'user' ? 'S' : 'AI' }}
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Message bubble -->
+                                    <div class="flex-1">
+                                        <div class="inline-block max-w-full px-4 py-3 rounded-2xl {{ $m->role === 'user' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-none' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-bl-none' }}">
+                                            @if ($m->role === 'assistant')
+                                                <div class="prose prose-sm dark:prose-invert max-w-none">
+                                                    {!! \Illuminate\Support\Str::markdown($m->content) !!}
+                                                </div>
+                                            @else
+                                                <p class="text-sm whitespace-pre-wrap">{{ $m->content }}</p>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 {{ $m->role === 'user' ? 'text-right' : '' }}">
+                                            {{ $m->created_at->format('H:i') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+
+                <!-- Input area -->
+                <div class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4">
+                    <div class="flex items-end space-x-4">
+                        <div class="flex-1">
+                            <textarea id="inp"
+                                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                                placeholder="{{ __('chat.search.placeholder') }}"
+                                rows="1"></textarea>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">Enter</kbd> {{ __('chat.input.send_btn') }} · 
+                                    <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">Shift+Enter</kbd> {{ __('chat.input.keyboard_shortcut') }}
+                                </span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 font-mono" id="char-count">0/2000</span>
+                            </div>
+                        </div>
+                        <button id="send-btn" 
+                            onclick="send()"
+                            class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105">
+                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <script src="https://js.puter.com/v2/"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <script>
         /* ═══════════════════════════════════════════
-       SOZLAMALAR
-    ═══════════════════════════════════════════ */
+        SOZLAMALAR
+        ═══════════════════════════════════════════ */
         const CSRF = '{{ csrf_token() }}';
         const URL_SAVE = '{{ route('chat.save') }}';
         const URL_NEW = '{{ route('chat.new-session') }}';
@@ -444,94 +278,13 @@
         const URL_SEARCH = '{{ route('chat.search-centers') }}';
         const MAX_MSGS = {{ $maxMsgs }};
 
-        // Puter modellar
-        const MODEL_MAIN = 'deepseek/deepseek-r1'; // Asosiy — chuqur fikrlash
-        const MODEL_FAST = 'deepseek/deepseek-chat'; // Tez — keyword extraction
+        // AI sozlamalari
+        const AI_ENABLED = {{ env('AI_SEARCH_ENABLED') ? 'true' : 'false' }};
+        const URL_AI = '{{ route('chat.ai-proxy') }}';
 
-        /* ═══════════════════════════════════════════
-           THEME MANAGEMENT
-        ═══════════════════════════════════════════ */
-        function initTheme() {
-            const container = document.getElementById('chat-container');
-            const saved = localStorage.getItem('chat-theme');
-
-            // Check if user has saved preference
-            if (saved === 'light') {
-                container.classList.remove('dark-mode');
-                container.classList.add('light-mode');
-            } else {
-                container.classList.remove('light-mode');
-                container.classList.add('dark-mode');
-                localStorage.setItem('chat-theme', 'dark'); // default to dark
-            }
-        }
-
-        function toggleTheme() {
-            const container = document.getElementById('chat-container');
-            const isDark = container.classList.contains('dark-mode');
-
-            if (isDark) {
-                container.classList.remove('dark-mode');
-                container.classList.add('light-mode');
-                localStorage.setItem('chat-theme', 'light');
-            } else {
-                container.classList.remove('light-mode');
-                container.classList.add('dark-mode');
-                localStorage.setItem('chat-theme', 'dark');
-            }
-        }
-
-        // Add theme toggle button
-        function addThemeToggle() {
-            const topbar = document.querySelector('.p-3.bg-slate-800\/50');
-            if (!topbar) return;
-
-            const toggleBtn = document.createElement('button');
-            toggleBtn.className =
-                'w-8 h-8 rounded-lg bg-slate-700\/50 border border-slate-600 flex items-center justify-center flex-shrink-0 transition-all duration-200 hover:bg-slate-600\/50 hover:border-slate-500';
-            toggleBtn.onclick = toggleTheme;
-            toggleBtn.title = '{{ __('chat.theme.toggle_title') }}';
-            toggleBtn.innerHTML = `
-        <svg class="w-4 h-4 text-slate-300 dark-mode-icon" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-        </svg>
-        <svg class="w-4 h-4 text-slate-300 light-mode-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-    `;
-
-            // Insert before the last element in topbar
-            const lastChild = topbar.lastElementChild;
-            topbar.insertBefore(toggleBtn, lastChild);
-
-            // Update icon based on current theme
-            updateThemeIcon();
-        }
-
-        function updateThemeIcon() {
-            const container = document.getElementById('chat-container');
-            const darkIcon = document.querySelector('.dark-mode-icon');
-            const lightIcon = document.querySelector('.light-mode-icon');
-
-            if (container.classList.contains('dark-mode')) {
-                darkIcon?.classList.remove('hidden');
-                lightIcon?.classList.add('hidden');
-            } else {
-                darkIcon?.classList.add('hidden');
-                lightIcon?.classList.remove('hidden');
-            }
-        }
-
-        // Override the original toggleTheme function to also update icon
-        const originalToggleTheme = toggleTheme;
-        toggleTheme = function() {
-            originalToggleTheme();
-            updateThemeIcon();
-        };
-        let currentSID = {{ $currentSession?->id ?? 'null' }};
-        let sessionFull = {{ $currentSession?->isFull() ? 'true' : 'false' }};
-        let msgCount = {{ $currentSession?->message_count ?? 0 }};
+        let currentSID = {{ $currentSession->id ?? 'null' }};
+        let sessionFull = {{ $currentSession->isFull() ? 'true' : 'false' }};
+        let msgCount = {{ $currentSession->message_count ?? 0 }};
 
         // AI uchun mahalliy tarix (oxirgi 6 xabar, har biri max 400 belgi)
         let localHistory = [];
@@ -541,23 +294,6 @@
                 content: @json(mb_substr($m->content, 0, 400))
             });
         @endforeach
-
-        /* ═══════════════════════════════════════════
-           SIDEBAR
-        ═══════════════════════════════════════════ */
-        function openSB() {
-            document.getElementById('sb').classList.remove('-translate-x-full');
-            document.getElementById('sb').classList.add('translate-x-0', 'shadow-2xl');
-            document.getElementById('ov').classList.remove('hidden');
-            document.getElementById('ov').classList.add('block');
-        }
-
-        function closeSB() {
-            document.getElementById('sb').classList.add('-translate-x-full');
-            document.getElementById('sb').classList.remove('translate-x-0', 'shadow-2xl');
-            document.getElementById('ov').classList.add('hidden');
-            document.getElementById('ov').classList.remove('block');
-        }
 
         /* ═══════════════════════════════════════════
            YANGI SUHBAT
@@ -571,18 +307,17 @@
            SESSIYA YUKLASH
         ═══════════════════════════════════════════ */
         async function loadSess(id) {
-            closeSB();
             if (id === currentSID) return;
 
             // Active state
-            document.querySelectorAll('.group\/\[280px\] > div > div > div').forEach(e => {
-                e.classList.remove('bg-blue-500/10', 'border-blue-500/20');
-                e.classList.add('border-transparent', 'hover:bg-white\/4');
+            document.querySelectorAll('#sess-list > div').forEach(e => {
+                e.classList.remove('bg-indigo-50', 'dark:bg-indigo-900/20', 'border-indigo-200', 'dark:border-indigo-700');
+                e.classList.add('border-transparent');
             });
             const activeEl = document.getElementById('si-' + id);
             if (activeEl) {
-                activeEl.classList.remove('border-transparent', 'hover:bg-white/4');
-                activeEl.classList.add('bg-blue-500/10', 'border-blue-500/20');
+                activeEl.classList.remove('border-transparent');
+                activeEl.classList.add('bg-indigo-50', 'dark:bg-indigo-900/20', 'border-indigo-200', 'dark:border-indigo-700');
             }
 
             const d = await api(URL_SESSION + '/' + id);
@@ -604,23 +339,36 @@
 
             // Qidiruv indikatorini qayta qo'shish
             const ind = document.createElement('div');
-            ind.className =
-                'hidden p-2 px-3 bg-blue-500/8 border border-blue-500/15 rounded-lg text-sm text-blue-500 items-center gap-2 mb-2 animate-fadeUp';
+            ind.className = 'hidden mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg';
             ind.id = 'search-indicator';
-            ind.innerHTML =
-                `<div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.15s"></div><div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.3s"></div><span id="search-text">Markazlar qidirilmoqda...</span>`;
+            ind.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <div class="flex space-x-1">
+                        <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                    <span class="text-sm text-blue-800 dark:text-blue-200" id="search-text">Markazlar qidirilmoqda...</span>
+                </div>`;
             box.appendChild(ind);
 
             if (d.messages.length === 0) {
-                box.innerHTML +=
-                    `<div class="empty-state"><div class="empty-icon">💬</div><h3>Bo'sh suhbat</h3><p>Savol yozing...</p></div>`;
+                box.innerHTML += `
+                    <div class="flex-1 flex flex-col items-center justify-center text-center py-12" id="empty-state">
+                        <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Bo'sh suhbat</h3>
+                        <p class="text-gray-600 dark:text-gray-400 max-w-md mb-8">Savol yozing...</p>
+                    </div>`;
             } else {
                 d.messages.forEach(m => appendMsg(m.role, m.content, m.created_at, false));
             }
 
             document.getElementById('tb-title').textContent = d.session.title;
             updProg(msgCount);
-            updBanner(sessionFull);
             scrollBot();
         }
 
@@ -654,384 +402,440 @@
            va qidiruv parametrlarini chiqarish
         ═══════════════════════════════════════════ */
         async function extractKeywords(userMsg) {
+            if (!AI_ENABLED) {
+                return {
+                    needs_search: false,
+                    province: null,
+                    subjects: [],
+                    query: ''
+                };
+            }
+
             const prompt = `Sen o'quv markaz qidiruv tizimining filter modulisan.
-Quyidagi foydalanuvchi so'rovini tahlil qil va FAQAT JSON qaytargin. Hech qanday izoh, matn yoki kod bloki yozma.
+            Quyidagi foydalanuvchi so'rovini tahlil qil va FAQAT JSON qaytargin. Hech qanday izoh, matn yoki kod bloki yozma.
 
-Qaytariladigan JSON formati:
-{
-  "needs_search": true,
-  "province": "Toshkent",
-  "subjects": ["matematika", "fizika"],
-  "query": "matematika kursi"
-}
+            Qaytariladigan JSON formati:
+            {
+            "needs_search": true,
+            "province": "Toshkent",
+            "subjects": ["matematika", "fizika"],
+            "query": "matematika kursi"
+            }
 
-Qoidalar:
-- needs_search: agar so'rov o'quv markaz, kurs, dars, ta'lim, o'qish, o'qituvchi bilan bog'liq bo'lsa TRUE, aks holda FALSE
-- province: faqat quyidagilardan biri yoki null:
-  Toshkent, Samarqand, Buxoro, Andijon, Namangan, Farg'ona,
-  Qashqadaryo, Surxandaryo, Xorazm, Navoiy, Jizzax, Sirdaryo, Qoraqalpog'iston
-- subjects: o'qitiladigan fanlar ro'yxati (matematika, ingliz tili, dasturlash, fizika va h.k.) — topilmasa bo'sh massiv
-- query: qidiruv uchun 2-4 ta eng muhim kalit so'z (o'zbek tilida)
+            Qoidalar:
+            - needs_search: agar so'rov o'quv markaz, kurs, dars, ta'lim, o'qish, o'qituvchi bilan bog'liq bo'lsa TRUE, aks holda FALSE
+            - province: faqat quyidagilardan biri yoki null:
+            Toshkent, Samarqand, Buxoro, Andijon, Namangan, Farg'ona,
+            Qashqadaryo, Surxandaryo, Xorazm, Navoiy, Jizzax, Sirdaryo, Qoraqalpog'iston
+            - subjects: o'qitiladigan fanlar ro'yxati (matematika, ingliz tili, dasturlash, fizika va h.k.) — topilmasa bo'sh massiv
+            - query: qidiruv uchun 2-4 ta eng muhim kalit so'z (o'zbek tilida)
 
-Foydalanuvchi so'rovi: "${userMsg}"`;
+            Foydalanuvchi so'rovi: "${userMsg}"`;
 
             try {
-                const r = await puter.ai.chat(prompt, {
-                    model: MODEL_FAST,
-                    stream: false
+                const response = await fetch(URL_AI, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        max_tokens: 200,
+                        temperature: 0.1
+                    })
                 });
-                const text = (r?.message?.content?.[0]?.text || r?.text || '').trim();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const text = data?.choices?.[0]?.message?.content || '';
                 const clean = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
-            return JSON.parse(clean);
-        } catch {
-            return {
-                needs_search: false,
-                province: null,
-                subjects: [],
-                query: ''
-            };
-        }
-    }
-
-    /* ═══════════════════════════════════════════
+                
+                return JSON.parse(clean);
+            } catch (error) {
+                console.error('Keyword extraction error:', error);
+                return {
+                    needs_search: false,
+                    province: null,
+                    subjects: [],
+                    query: ''
+                };
+            }
+        } /* ═══════════════════════════════════════════
        MARKAZLARNI QIDIRISH (MySQL LIKE)
-    ═══════════════════════════════════════════ */
-    async function searchCenters(kw) {
-        showSearchIndicator('Markazlar qidirilmoqda...');
-        try {
-            const r = await api(URL_SEARCH, 'POST', {
-                keywords: kw
-            });
-            hideSearchIndicator();
-            return (r.ok && r.count > 0) ? r : null;
-        } catch {
-            hideSearchIndicator();
-            return null;
-        }
-    }
-
-    function showSearchIndicator(text) {
-        const el = document.getElementById('search-indicator');
-        const tx = document.getElementById('search-text');
-        if (el) {
-            el.classList.remove('hidden');
-            el.classList.add('flex');
-            if (tx) tx.textContent = text;
-        }
-    }
-
-    function hideSearchIndicator() {
-        const el = document.getElementById('search-indicator');
-        if (el) {
-            el.classList.add('hidden');
-            el.classList.remove('flex');
-        }
-    }
-
-    /* ═══════════════════════════════════════════
-       ASOSIY YUBORISH FUNKSIYASI
-    ═══════════════════════════════════════════ */
-    async function send() {
-        const msg = inp.value.trim();
-        if (!msg) return;
-        if (sessionFull) {
-            updBanner(true);
-            return;
+        ═══════════════════════════════════════════ */
+        async function searchCenters(kw) {
+            showSearchIndicator('Markazlar qidirilmoqda...');
+            try {
+                const r = await api(URL_SEARCH, 'POST', {
+                    keywords: kw
+                });
+                hideSearchIndicator();
+                return (r.ok && r.count > 0) ? r : null;
+            } catch {
+                hideSearchIndicator();
+                return null;
+            }
         }
 
-        // Empty state ni olib tashlash
-        document.getElementById('empty-state')?.remove();
+        function showSearchIndicator(text) {
+            const el = document.getElementById('search-indicator');
+            const tx = document.getElementById('search-text');
+            if (el) {
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+                if (tx) tx.textContent = text;
+            }
+        }
 
-        // User xabari
-        appendMsg('user', msg);
+        function hideSearchIndicator() {
+            const el = document.getElementById('search-indicator');
+            if (el) {
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            }
+        }
 
-        // Input tozalash
-        inp.value = '';
-        inp.style.height = 'auto';
-        document.getElementById('char-count').textContent = '0/2000';
-        document.getElementById('send-btn').disabled = true;
-        inp.disabled = true;
+        /* ═══════════════════════════════════════════
+        ASOSIY YUBORISH FUNKSIYASI
+        ═══════════════════════════════════════════ */
+        async function send() {
+            const msg = inp.value.trim();
+            if (!msg) return;
+            if (sessionFull) {
+                updBanner(true);
+                return;
+            }
 
-        const typingEl = appendTyping();
+            // Empty state ni olib tashlash
+            document.getElementById('empty-state')?.remove();
 
-        try {
-            /* ── 1. Keyword extraction ── */
-            const kw = await extractKeywords(msg);
+            // User xabari
+            appendMsg('user', msg);
 
-            /* ── 2. Markaz qidirish (kerak bo'lsa) ── */
-            let centerContext = '';
-            let foundCount = 0;
+            // Input tozalash
+            inp.value = '';
+            inp.style.height = 'auto';
+            document.getElementById('char-count').textContent = '0/2000';
+            document.getElementById('send-btn').disabled = true;
+            inp.disabled = true;
 
-            if (kw.needs_search) {
-                const result = await searchCenters({
-                    province: kw.province,
-                    subjects: kw.subjects,
-                    query: kw.query || msg,
+            const typingEl = appendTyping();
+
+            try {
+                /* ── 1. Keyword extraction ── */
+                const kw = await extractKeywords(msg);
+
+                /* ── 2. Markaz qidirish (kerak bo'lsa) ── */
+                let centerContext = '';
+                let foundCount = 0;
+
+                if (kw.needs_search) {
+                    const result = await searchCenters({
+                        province: kw.province,
+                        subjects: kw.subjects,
+                        query: kw.query || msg,
+                    });
+
+                    if (result) {
+                        foundCount = result.count;
+                        centerContext = result.context;
+                    }
+                }
+
+                /* ── 3. System prompt ── */
+                const systemPrompt = buildSystemPrompt(centerContext, foundCount);
+
+                /* ── 4. AI ga yuborish ── */
+                const messages = [{
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    ...localHistory,
+                    {
+                        role: 'user',
+                        content: msg
+                    }
+                ];
+
+                // AI ga so'rov (Laravel proxy orqali — CORS muammosini oldini oladi)
+                const response = await fetch(URL_AI, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF
+                    },
+                    body: JSON.stringify({
+                        messages: messages,
+                        max_tokens: 2000,
+                        temperature: 0.7
+                    })
                 });
 
-                if (result) {
-                    foundCount = result.count;
-                    centerContext = result.context;
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            }
 
-            /* ── 3. System prompt ── */
-            const systemPrompt = buildSystemPrompt(centerContext, foundCount);
+                const data = await response.json();
+                const fullResp = data?.choices?.[0]?.message?.content || '';
 
-            /* ── 4. AI ga yuborish ── */
-            const messages = [{
-                    role: 'system',
-                    content: systemPrompt
-                },
-                ...localHistory,
-                {
+                typingEl.remove();
+
+                const aiEl = appendMsg('ai', fullResp, false);
+                const aiMd = aiEl.querySelector('.ai-md');
+                aiMd.innerHTML = marked.parse(fullResp);
+                scrollBot();
+
+                /* ── 5. Mahalliy tarixni yangilash ── */
+                localHistory.push({
                     role: 'user',
-                    content: msg
-                }
-            ];
+                    content: msg.substring(0, 400)
+                });
+                localHistory.push({
+                    role: 'assistant',
+                    content: fullResp.substring(0, 400)
+                });
+                if (localHistory.length > 12) localHistory = localHistory.slice(-12);
 
-            const stream = await puter.ai.chat(messages, {
-                model: MODEL_MAIN,
-                stream: true
+                /* ── 6. DB ga saqlash ── */
+                const saved = await api(URL_SAVE, 'POST', {
+                    session_id: currentSID,
+                    user_message: msg,
+                    ai_response: fullResp,
+                    model: '{{ env('AI_SEARCH_MODEL', 'huggingface-llama') }}',
+                });
+
+                if (saved.ok) {
+                    currentSID = saved.session_id;
+                    msgCount += 2;
+                    sessionFull = saved.is_full;
+                    updProg(msgCount);
+                    updBanner(sessionFull);
+                    updSidebarItem(currentSID, msg, msgCount, sessionFull);
+                }
+
+            } catch (err) {
+                typingEl?.remove();
+                hideSearchIndicator();
+                appendMsg('ai', '{{ __('chat.messages.error') }}');
+                console.error(err);
+            } finally {
+                document.getElementById('send-btn').disabled = false;
+                inp.disabled = false;
+                inp.focus();
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+        SYSTEM PROMPT YARATISH
+        Markaz ma'lumotlari bo'lsa — tafsiya rejimi
+        Bo'lmasa — umumiy maslahat rejimi
+        ═══════════════════════════════════════════ */
+        function buildSystemPrompt(centerContext, foundCount) {
+            const today = new Date().toLocaleDateString('uz-UZ', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
 
-            typingEl.remove();
+            const base = `Siz O'zbekistondagi ta'lim sohasida ixtisoslashgan AI maslahatchi bo'lgan "EduBot"siz.
+            Bugun: ${today}
+            Til: faqat O'zbek tilida javob bering.
+            Uslub: samimiy, aniq, foydali. Keraksiz uzun so'zlardan saqlaning.`;
 
-            const aiEl = appendMsg('ai', '', true);
-            const aiMd = aiEl.querySelector('.ai-md');
-            let fullResp = '';
+            if (centerContext && foundCount > 0) {
+                return `${base}
 
-            for await (const part of stream) {
-                if (part?.text) {
-                    fullResp += part.text;
-                    aiMd.innerHTML = marked.parse(fullResp);
-                    scrollBot();
+            VAZIFA: Foydalanuvchi o'quv markaz haqida so'radi. Quyida ma'lumotlar bazasidan topilgan ${foundCount} ta eng mos markaz berilgan.
+
+            === MARKAZLAR MA'LUMOTI ===
+            ${centerContext}
+            === MA'LUMOT TUGADI ===
+
+            Javob berish qoidalari:
+            1. FAQAT yuqoridagi ro'yxatdagi markazlarni tavsiya qiling — o'zingizdan markaz to'qimang
+            2. Har bir tavsiya uchun quyidagi formatda yozing:
+            **[Markaz nomi]** — [Viloyat, Tuman]
+            • Fanlar: [fanlar va narxlar]
+            • [Qo'shimcha muhim ma'lumot]
+            3. Agar foydalanuvchining talabiga mos markaz topilmasa — "Afsuski, [shart] bo'yicha mos markaz topilmadi" deb ayting
+            4. Tavsiyadan keyin qisqa maslahat bering (qaysi mezonlar bo'yicha tanlash kerak)
+            5. Markazlarni student_count (o'quvchilar soni) ko'p bo'lgani yaxshiroq deb hisoblang`;
                 }
+
+                return `${base}
+
+            VAZIFA: Foydalanuvchiga ta'lim va o'quv markazlar haqida umumiy maslahat bering.
+
+            Qila oladigan narsalaringiz:
+            - O'quv markaz tanlash bo'yicha maslahat
+            - Fan va kurslar haqida ma'lumot
+            - O'qish metodlari va maslahatlar
+            - O'zbekistondagi ta'lim tizimi haqida
+
+            Agar foydalanuvchi muayyan viloyat yoki fan bo'yicha markaz so'rasa:
+            "[Viloyat]da [fan] bo'yicha markazlarni qidirish uchun aniqroq yozing" deb yo'naltiring.`;
+        }
+
+        /* ═══════════════════════════════════════════
+        DOM YORDAMCHI FUNKSIYALAR
+        ═══════════════════════════════════════════ */
+        function appendMsg(role, content, time, isStreaming = false) {
+            const box = document.getElementById('msgs');
+            const t = time || new Date().toLocaleTimeString('uz', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const div = document.createElement('div');
+            div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} mb-4 animate-fade-in`;
+
+            const innerDiv = document.createElement('div');
+            innerDiv.className = `flex items-start space-x-3 max-w-3xl ${role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`;
+
+            // Avatar
+            const avatar = document.createElement('div');
+            avatar.className = `flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${role === 'user' ? 'bg-gradient-to-r from-indigo-500 to-purple-600' : 'bg-gray-200 dark:bg-gray-700'}`;
+            avatar.innerHTML = `<span class="text-sm font-medium ${role === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-300'}">${role === 'user' ? 'S' : 'AI'}</span>`;
+
+            // Message content
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'flex-1';
+            
+            const bubble = document.createElement('div');
+            bubble.className = `inline-block max-w-full px-4 py-3 rounded-2xl ${role === 'user' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-none' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-bl-none'}`;
+            
+            if (role === 'assistant') {
+                bubble.innerHTML = `<div class="prose prose-sm dark:prose-invert max-w-none">${isStreaming ? '' : marked.parse(content)}</div>`;
+            } else {
+                bubble.innerHTML = `<p class="text-sm whitespace-pre-wrap">${content}</p>`;
             }
 
-            /* ── 5. Mahalliy tarixni yangilash ── */
-            localHistory.push({
-                role: 'user',
-                content: msg.substring(0, 400)
-            });
-            localHistory.push({
-                role: 'assistant',
-                content: fullResp.substring(0, 400)
-            });
-            if (localHistory.length > 12) localHistory = localHistory.slice(-12);
-
-            /* ── 6. DB ga saqlash ── */
-            const saved = await api(URL_SAVE, 'POST', {
-                session_id: currentSID,
-                user_message: msg,
-                ai_response: fullResp,
-                model: MODEL_MAIN,
+            const timeDiv = document.createElement('p');
+            timeDiv.className = `text-xs text-gray-500 dark:text-gray-400 mt-1 ${role === 'user' ? 'text-right' : ''}`;
+            timeDiv.textContent = time ? (new Date(time)).toLocaleTimeString('uz-UZ', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : (new Date()).toLocaleTimeString('uz-UZ', {
+                hour: '2-digit',
+                minute: '2-digit'
             });
 
-            if (saved.ok) {
-                currentSID = saved.session_id;
-                msgCount += 2;
-                sessionFull = saved.is_full;
-                updProg(msgCount);
-                updBanner(sessionFull);
-                updSidebarItem(currentSID, msg, msgCount, sessionFull);
-            }
+            contentDiv.appendChild(bubble);
+            contentDiv.appendChild(timeDiv);
+            innerDiv.appendChild(avatar);
+            innerDiv.appendChild(contentDiv);
+            div.appendChild(innerDiv);
+            box.appendChild(div);
 
-        } catch (err) {
-            typingEl?.remove();
-            hideSearchIndicator();
-            appendMsg('ai', '{{ __('chat.messages.error') }}');
-            console.error(err);
-        } finally {
-            document.getElementById('send-btn').disabled = false;
-            inp.disabled = false;
-            inp.focus();
-        }
-    }
-
-    /* ═══════════════════════════════════════════
-       SYSTEM PROMPT YARATISH
-       Markaz ma'lumotlari bo'lsa — tafsiya rejimi
-       Bo'lmasa — umumiy maslahat rejimi
-    ═══════════════════════════════════════════ */
-    function buildSystemPrompt(centerContext, foundCount) {
-        const today = new Date().toLocaleDateString('uz-UZ', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        const base = `Siz O'zbekistondagi ta'lim sohasida ixtisoslashgan AI maslahatchi bo'lgan "EduBot"siz.
-    Bugun: ${today}
-    Til: faqat O'zbek tilida javob bering.
-    Uslub: samimiy, aniq, foydali. Keraksiz uzun so'zlardan saqlaning.`;
-
-        if (centerContext && foundCount > 0) {
-            return `${base}
-
-    VAZIFA: Foydalanuvchi o'quv markaz haqida so'radi. Quyida ma'lumotlar bazasidan topilgan ${foundCount} ta eng mos markaz berilgan.
-
-    === MARKAZLAR MA'LUMOTI ===
-    ${centerContext}
-    === MA'LUMOT TUGADI ===
-
-    Javob berish qoidalari:
-    1. FAQAT yuqoridagi ro'yxatdagi markazlarni tavsiya qiling — o'zingizdan markaz to'qimang
-    2. Har bir tavsiya uchun quyidagi formatda yozing:
-       **[Markaz nomi]** — [Viloyat, Tuman]
-       • Fanlar: [fanlar va narxlar]
-       • [Qo'shimcha muhim ma'lumot]
-    3. Agar foydalanuvchining talabiga mos markaz topilmasa — "Afsuski, [shart] bo'yicha mos markaz topilmadi" deb ayting
-    4. Tavsiyadan keyin qisqa maslahat bering (qaysi mezonlar bo'yicha tanlash kerak)
-    5. Markazlarni student_count (o'quvchilar soni) ko'p bo'lgani yaxshiroq deb hisoblang`;
+            scrollBot();
+            return div;
         }
 
-        return `${base}
+        function appendTyping() {
+            const box = document.getElementById('msgs');
+            
+            const div = document.createElement('div');
+            div.className = 'flex justify-start mb-4 animate-fade-in';
 
-    VAZIFA: Foydalanuvchiga ta'lim va o'quv markazlar haqida umumiy maslahat bering.
+            const innerDiv = document.createElement('div');
+            innerDiv.className = 'flex items-start space-x-3 max-w-3xl';
 
-    Qila oladigan narsalaringiz:
-    - O'quv markaz tanlash bo'yicha maslahat
-    - Fan va kurslar haqida ma'lumot
-    - O'qish metodlari va maslahatlar
-    - O'zbekistondagi ta'lim tizimi haqida
+            // Avatar
+            const avatar = document.createElement('div');
+            avatar.className = 'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700';
+            avatar.innerHTML = '<span class="text-sm font-medium text-gray-600 dark:text-gray-300">AI</span>';
 
-    Agar foydalanuvchi muayyan viloyat yoki fan bo'yicha markaz so'rasa:
-    "[Viloyat]da [fan] bo'yicha markazlarni qidirish uchun aniqroq yozing" deb yo'naltiring.`;
-    }
-
-    /* ═══════════════════════════════════════════
-       DOM YORDAMCHI FUNKSIYALAR
-    ═══════════════════════════════════════════ */
-    function appendMsg(role, content, time, isStreaming = false) {
-        const box = document.getElementById('msgs');
-        const t = time || new Date().toLocaleTimeString('uz', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        const div = document.createElement('div');
-        div.className = `flex gap-2.5 animate-fadeUp ${role === 'user' ? 'flex-row-reverse' : ''}`;
-
-        const avatar = document.createElement('div');
-        avatar.className =
-            `w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 font-mono ${role === 'user' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' : 'bg-slate-800/50 border border-slate-600 text-blue-500'}`;
-        avatar.textContent = role === 'user' ? '{{ __('chat.messages.user_prefix') }}' : '{{ __('chat.messages.ai_prefix') }}';
-
-        const body = document.createElement('div');
-        body.className = `max-w-[74%] flex flex-col ${role === 'user' ? 'items-end' : ''}`;
-
-        const bubble = document.createElement('div');
-        bubble.className =
-            `px-4 py-3 rounded-[14px] text-sm leading-relaxed ${role === 'user' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-br-sm' : 'bg-slate-800/50 border border-slate-600 text-slate-300 rounded-bl-sm'}`;
-        if (role === 'assistant') {
-            bubble.innerHTML = `<div class="ai-md">${isStreaming ? '' : marked.parse(content)}</div>`;
-        } else {
-            bubble.textContent = content;
-        }
-
-        const msgTime = document.createElement('div');
-        msgTime.className = 'text-[10px] text-slate-500 mt-1 px-0.5';
-        msgTime.textContent = time ? (new Date(time)).toLocaleTimeString('uz-UZ', {
-            hour: '2-digit',
-            minute: '2-digit'
-        }) : (new Date()).toLocaleTimeString('uz-UZ', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        body.appendChild(bubble);
-        body.appendChild(msgTime);
-        div.appendChild(avatar);
-        div.appendChild(body);
-        box.appendChild(div);
-
-        scrollBot();
-        return div;
-    }
-
-    function appendTyping() {
-        const box = document.getElementById('msgs');
-        const div = document.createElement('div');
-        div.className = 'flex gap-2.5 animate-fadeUp';
-
-        const avatar = document.createElement('div');
-        avatar.className =
-            'w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 font-mono bg-slate-800/50 border border-slate-600 text-blue-500';
-        avatar.textContent = 'AI';
-
-        const body = document.createElement('div');
-        body.className = 'max-w-[74%] flex flex-col';
-
-        const bubble = document.createElement('div');
-        bubble.className =
-            'px-4 py-3 rounded-[14px] text-sm leading-relaxed bg-slate-800/50 border border-slate-600 text-slate-300 rounded-bl-sm';
-        bubble.innerHTML =
-            '<div class="flex gap-1 items-center p-0.5"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.2s"></span><span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.4s"></span></div>';
-
-        body.appendChild(bubble);
-        div.appendChild(avatar);
-        div.appendChild(body);
-        box.appendChild(div);
-
-        scrollBot();
-        return div;
-    }
-
-    function scrollBot() {
-        const b = document.getElementById('msgs');
-        b.scrollTop = b.scrollHeight;
-    }
-
-    function esc(t) {
-        const d = document.createElement('div');
-        d.textContent = t;
-        return d.innerHTML;
-    }
-
-    /* ═══════════════════════════════════════════
-       UI YANGILASH
-    ═══════════════════════════════════════════ */
-    function updProg(n) {
-        const pct = Math.min(n / MAX_MSGS * 100, 100);
-        document.getElementById('prog-fill').style.width = pct + '%';
-        document.getElementById('prog-txt').textContent = n + '/' + MAX_MSGS;
-        document.getElementById('tb-sub').textContent = n + '/' + MAX_MSGS + ' xabar';
-    }
-
-    function updBanner(isFull) {
-        const b = document.getElementById('full-banner');
-        isFull ? b.classList.add('show') : b.classList.remove('show');
-    }
-
-    function updSidebarItem(id, lastMsg, count, isFull) {
-        document.getElementById('sess-empty')?.remove();
-        document.querySelectorAll('.si').forEach(e => e.classList.remove('active'));
-
-        let el = document.getElementById('si-' + id);
-
-        if (!el) {
-            el = document.createElement('div');
-            el.className = 'si active';
-            el.id = 'si-' + id;
-            el.onclick = () => loadSess(id);
-            el.innerHTML = `
-                <div class="si-title">${esc(lastMsg.substring(0, 42))}</div>
-                <div class="si-meta">
-                    <span class="bdg b-a">Faol</span>
-                    <span>${count}/${MAX_MSGS}</span>
+            // Typing indicator
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'flex-1';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'inline-block max-w-full px-4 py-3 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-bl-none';
+            bubble.innerHTML = `
+                <div class="flex space-x-1">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                 </div>
-                <div class="si-prev">${esc(lastMsg.substring(0, 48))}</div>`;
-            document.getElementById('sess-list').prepend(el);
-        } else {
-            el.classList.add('active');
-            const meta = el.querySelector('.si-meta');
-            if (meta) {
-                meta.innerHTML = `
-                    <span class="bdg ${isFull ? 'b-c' : 'b-a'}">${isFull ? 'Yopiq' : 'Faol'}</span>
-                    <span>${count}/${MAX_MSGS}</span>`;
+            `;
+
+            contentDiv.appendChild(bubble);
+            innerDiv.appendChild(avatar);
+            innerDiv.appendChild(contentDiv);
+            div.appendChild(innerDiv);
+            box.appendChild(div);
+
+            scrollBot();
+            return div;
+        }
+
+        function scrollBot() {
+            const b = document.getElementById('msgs');
+            b.scrollTop = b.scrollHeight;
+        }
+
+        function esc(t) {
+            const d = document.createElement('div');
+            d.textContent = t;
+            return d.innerHTML;
+        }
+
+        /* ═══════════════════════════════════════════
+        UI YANGILASH
+        ═══════════════════════════════════════════ */
+        function updProg(n) {
+            const pct = Math.min(n / MAX_MSGS * 100, 100);
+            document.getElementById('prog-fill').style.width = pct + '%';
+            document.getElementById('prog-txt').textContent = n + '/' + MAX_MSGS;
+            document.getElementById('tb-sub').textContent = n + '/' + MAX_MSGS + ' xabar';
+        }
+
+        function updBanner(isFull) {
+            const b = document.getElementById('full-banner');
+            isFull ? b.classList.add('show') : b.classList.remove('show');
+        }
+
+        function updSidebarItem(id, lastMsg, count, isFull) {
+            document.getElementById('sess-empty')?.remove();
+
+            let el = document.getElementById('si-' + id);
+
+            if (!el) {
+                el = document.createElement('div');
+                el.className = 'group cursor-pointer rounded-lg p-3 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20';
+                el.id = 'si-' + id;
+                el.onclick = () => loadSess(id);
+                el.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${esc(lastMsg.substring(0, 42))}</p>
+                            <div class="flex items-center mt-1 space-x-2">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isFull ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'}">${isFull ? 'Yopiq' : 'Faol'}</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">${count}/${MAX_MSGS}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">${esc(lastMsg.substring(0, 48))}</p>
+                        </div>
+                    </div>`;
+                document.getElementById('sess-list').prepend(el);
+            } else {
+                el.classList.add('bg-indigo-50', 'dark:bg-indigo-900/20', 'border-indigo-200', 'dark:border-indigo-700');
+                el.classList.remove('border-transparent');
+                const meta = el.querySelector('.inline-flex');
+                if (meta) {
+                    meta.className = `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isFull ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'}`;
+                    meta.textContent = isFull ? 'Yopiq' : 'Faol';
                 }
-                const prev = el.querySelector('.si-prev');
-                if (prev) prev.textContent = lastMsg.substring(0, 48);
+                const prev = el.querySelector('.text-xs.text-gray-500');
+                if (prev) prev.textContent = esc(lastMsg.substring(0, 48));
             }
         }
 
@@ -1055,8 +859,6 @@ Foydalanuvchi so'rovi: "${userMsg}"`;
            INIT
         ═══════════════════════════════════════════ */
         window.addEventListener('load', () => {
-            initTheme();
-            addThemeToggle();
             scrollBot();
             inp.focus();
         });

@@ -7,7 +7,7 @@ return [
     // Hero Section
     'hero' => [
         'badge' => 'RIASEC Test',
-        'title' => 'Career Guidance<br>Psychological Test',
+        'title' => 'Career Guidance Psychological Test',
         'description' => 'Answer "Yes" or "No" to 24 questions. In the result, you will see the most suitable careers in percentages.',
     ],
 

@@ -7,7 +7,7 @@ return [
     // Hero Section
     'hero' => [
         'badge' => 'RIASEC Test',
-        'title' => 'Kasbga yo\'naltiruvchi<br>psixologik test',
+        'title' => 'Kasbga yo\'naltiruvchi psixologik test',
         'description' => '24 ta savolga «Ha» yoki «Yo\'q» deb javob bering. Natijada sizga eng mos yo\'nalishlar foizlarda chiqadi.',
     ],
 

@@ -115,6 +115,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat/session/{id}',     [ChatController::class, 'getSession'])->name('chat.get-session');
     Route::get('/chat/sessions',         [ChatController::class, 'getSessions'])->name('chat.get-sessions');
     Route::post('/chat/search-centers',  [ChatController::class, 'searchCenters'])->name('chat.search-centers');
+    Route::post('/chat/ai-proxy',        [ChatController::class, 'proxyAi'])->name('chat.ai-proxy');
 
     // ── RIASEC ──
     Route::get('/riasec',                [ChatController::class, 'riasec'])->name('chat.riasec');

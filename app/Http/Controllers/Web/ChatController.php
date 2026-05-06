@@ -246,6 +246,133 @@ class ChatController extends Controller
         return response()->json(['ok' => true, 'sessions' => $sessions]);
     }
 
+    /* ── AI API PROXY — CORS muammosini oldini oladi ── */
+
+    public function proxyAi(Request $request)
+    {
+        $request->validate([
+            'messages' => 'required|array',
+            'temperature' => 'nullable|numeric',
+            'max_tokens' => 'nullable|integer',
+        ]);
+
+        if (!env('AI_SEARCH_ENABLED')) {
+            return response()->json([
+                'choices' => [
+                    ['message' => ['content' => 'AI xizmati vaqtinchalik o‘chirilgan.']]
+                ]
+            ], 503);
+        }
+
+        try {
+            $apiKey = env('AI_SEARCH_KEY');
+            $model = env('AI_SEARCH_MODEL', 'mistralai/Mistral-7B-Instruct-v0.2');
+            $timeout = (int) env('AI_SEARCH_TIMEOUT', 30);
+
+            // Hugging Face Inference API (standard format)
+            $url = 'https://api-inference.huggingface.co/models/' . $model;
+
+            // Messages ni prompt ga aylantirish
+            $prompt = $this->messagesToPrompt($request->messages);
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ])->timeout($timeout)
+              ->post($url, [
+                  'inputs' => $prompt,
+                  'parameters' => [
+                      'temperature' => $request->input('temperature', 0.7),
+                      'max_new_tokens' => $request->input('max_tokens', 2000),
+                      'return_full_text' => false,
+                  ],
+              ]);
+
+            if ($response->failed()) {
+                Log::error('AI proxy error', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'url' => $url,
+                ]);
+                return response()->json([
+                    'choices' => [
+                        ['message' => ['content' => 'AI xizmatida vaqtinchalik nosozlik. Iltimos, keyinroq urinib ko‘ring.']]
+                    ]
+                ], 500);
+            }
+
+            $result = $response->json();
+
+            // Hugging Face inference API response: [[{"generated_text":"..."}]]
+            $text = '';
+            if (is_array($result) && isset($result[0])) {
+                $first = $result[0];
+                if (is_array($first) && isset($first[0]['generated_text'])) {
+                    $text = $first[0]['generated_text'];
+                } elseif (isset($first['generated_text'])) {
+                    $text = $first['generated_text'];
+                }
+            }
+
+            // OpenAI-compatible formatga o‘girish
+            return response()->json([
+                'choices' => [
+                    [
+                        'message' => [
+                            'role' => 'assistant',
+                            'content' => trim($text) ?: 'Javob yaratib bo‘lmadi.',
+                        ],
+                        'finish_reason' => 'stop',
+                        'index' => 0,
+                    ]
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('AI proxy exception', ['message' => $e->getMessage()]);
+            return response()->json([
+                'choices' => [
+                    ['message' => ['content' => 'AI xizmatida xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.']]
+                ]
+            ], 500);
+        }
+    }
+
+    /**
+     * OpenAI messages formatini Hugging Face promptiga aylantirish
+     */
+    private function messagesToPrompt(array $messages): string
+    {
+        $parts = [];
+        foreach ($messages as $msg) {
+            $role = $msg['role'] ?? 'user';
+            $content = $msg['content'] ?? '';
+
+            switch ($role) {
+                case 'system':
+                    $parts[] = "[INST] <<SYS>>\n{$content}\n<</SYS>>\n\n";
+                    break;
+                case 'user':
+                    $parts[] = "{$content} [/INST]";
+                    break;
+                case 'assistant':
+                    $parts[] = "{$content} </s><s>[INST] ";
+                    break;
+                default:
+                    $parts[] = $content;
+            }
+        }
+
+        // Agar system bo‘lmasa, umumiy shaklda qo‘shish
+        $prompt = implode("\n", $parts);
+
+        // Llama/Instruct formatini to‘g‘rilash
+        if (!str_contains($prompt, '[INST]')) {
+            $prompt = "[INST] {$prompt} [/INST]";
+        }
+
+        return $prompt;
+    }
+
     /* ── RIASEC ── */
 
     public function quiz()

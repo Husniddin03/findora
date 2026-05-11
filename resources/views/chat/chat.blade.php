@@ -1,8 +1,6 @@
 <x-layout>
     <x-slot:title>{{ __('chat.title') }}</x-slot:title>
 
-    @php $maxMsgs = \App\Models\ChatSession::MAX_MESSAGES; @endphp
-
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         <!-- Mobile sidebar overlay -->
         <div x-data="{ sidebarOpen: false }" 
@@ -67,7 +65,6 @@
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $s->status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' }}">
                                                 {{ $s->status === 'active' ? 'Faol' : 'Yopiq' }}
                                             </span>
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $s->message_count }}/{{ $maxMsgs }}</span>
                                             <span class="text-xs text-gray-500 dark:text-gray-400">{{ $s->created_at->format('d.m') }}</span>
                                         </div>
                                         @if ($s->lastMessage)
@@ -102,28 +99,16 @@
                             </button>
                             
                             <div>
-                                <h1 class="text-xl font-semibold text-gray-900 dark:text-white" id="tb-title">
+                                <h1 class="text-xl font-bold text-gray-900 dark:text-white" id="tb-title">
                                     {{ $currentSession?->title ?? __('chat.topbar.title_default') }}
                                 </h1>
                                 <p class="text-sm text-gray-500 dark:text-gray-400" id="tb-sub">
-                                    {{ $currentSession ? $currentSession->message_count . '/' . $maxMsgs . ' ' . __('chat.topbar.subtitle_with_count') : __('chat.topbar.subtitle') }}
+                                    {{ $currentSession ? __('chat.topbar.subtitle') : '' }}
                                 </p>
                             </div>
                         </div>
 
                         <div class="flex items-center space-x-4">
-                            <!-- Progress indicator -->
-                            <div class="flex items-center space-x-2">
-                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-300" 
-                                         id="prog-fill"
-                                         style="width: {{ $currentSession ? round(($currentSession->message_count / $maxMsgs) * 100) : 0 }}%"></div>
-                                </div>
-                                <span class="text-sm text-gray-500 dark:text-gray-400 font-mono" id="prog-txt">
-                                    {{ $currentSession?->message_count ?? 0 }}/{{ $maxMsgs }}
-                                </span>
-                            </div>
-
                             <!-- Theme toggle -->
                             <button onclick="toggleTheme()" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,25 +121,6 @@
                         </div>
                     </div>
                 </header>
-
-                <!-- Full banner -->
-                @if ($currentSession?->isFull())
-                    <div class="bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 px-6 py-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                                </svg>
-                                <p class="text-sm text-red-800 dark:text-red-200">
-                                    {{ __('chat.full_banner.message', ['count' => $maxMsgs]) }}
-                                </p>
-                            </div>
-                            <button onclick="newChat()" class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline">
-                                {{ __('chat.full_banner.new_chat') }}
-                            </button>
-                        </div>
-                    </div>
-                @endif
 
                 <!-- Messages area -->
                 <div class="flex-1 overflow-y-auto px-6 py-6" id="msgs">
@@ -276,15 +242,12 @@
         const URL_NEW = '{{ route('chat.new-session') }}';
         const URL_SESSION = '{{ url('chat/session') }}';
         const URL_SEARCH = '{{ route('chat.search-centers') }}';
-        const MAX_MSGS = {{ $maxMsgs }};
 
-        // AI sozlamalari
-        const AI_ENABLED = {{ env('AI_SEARCH_ENABLED') ? 'true' : 'false' }};
+        // Groq AI sozlamalari
+        const AI_ENABLED = {{ config('services.groq.enabled') ? 'true' : 'false' }};
         const URL_AI = '{{ route('chat.ai-proxy') }}';
 
-        let currentSID = {{ $currentSession->id ?? 'null' }};
-        let sessionFull = {{ $currentSession->isFull() ? 'true' : 'false' }};
-        let msgCount = {{ $currentSession->message_count ?? 0 }};
+        let currentSID = {{ $currentSession?->id ?? 'null' }};
 
         // AI uchun mahalliy tarix (oxirgi 6 xabar, har biri max 400 belgi)
         let localHistory = [];
@@ -324,8 +287,6 @@
             if (!d.ok) return;
 
             currentSID = id;
-            sessionFull = d.is_full;
-            msgCount = d.session.message_count || 0;
 
             // Tarixni yangilash
             localHistory = d.messages.slice(-6).map(m => ({
@@ -368,7 +329,6 @@
             }
 
             document.getElementById('tb-title').textContent = d.session.title;
-            updProg(msgCount);
             scrollBot();
         }
 
@@ -510,10 +470,6 @@
         async function send() {
             const msg = inp.value.trim();
             if (!msg) return;
-            if (sessionFull) {
-                updBanner(true);
-                return;
-            }
 
             // Empty state ni olib tashlash
             document.getElementById('empty-state')?.remove();
@@ -610,16 +566,12 @@
                     session_id: currentSID,
                     user_message: msg,
                     ai_response: fullResp,
-                    model: '{{ env('AI_SEARCH_MODEL', 'huggingface-llama') }}',
+                    model: '{{ config('services.groq.model') }}',
                 });
 
                 if (saved.ok) {
                     currentSID = saved.session_id;
-                    msgCount += 2;
-                    sessionFull = saved.is_full;
-                    updProg(msgCount);
-                    updBanner(sessionFull);
-                    updSidebarItem(currentSID, msg, msgCount, sessionFull);
+                    updSidebarItem(currentSID, msg);
                 }
 
             } catch (err) {
@@ -660,15 +612,22 @@
             ${centerContext}
             === MA'LUMOT TUGADI ===
 
+            MUHIM: Yuqoridagi ma'lumotlarda markaz nomlari markdown link formatida berilgan: **[Markaz nomi](url)**.
+            Bu linklarni o'zgartirmasdan, aynan shu formatda qoldiring. Foydalanuvchi shu link orqali markaz sahifasiga o'tadi.
+
             Javob berish qoidalari:
             1. FAQAT yuqoridagi ro'yxatdagi markazlarni tavsiya qiling — o'zingizdan markaz to'qimang
             2. Har bir tavsiya uchun quyidagi formatda yozing:
-            **[Markaz nomi]** — [Viloyat, Tuman]
-            • Fanlar: [fanlar va narxlar]
+            **[Markaz nomi](url)** — [Viloyat, Tuman]
+            • Turi: [markaz turi]
+            • Reyting: [reyting]
+            • O'quvchilar: [soni]
+            • Manzil: [manzil]
             • [Qo'shimcha muhim ma'lumot]
-            3. Agar foydalanuvchining talabiga mos markaz topilmasa — "Afsuski, [shart] bo'yicha mos markaz topilmadi" deb ayting
-            4. Tavsiyadan keyin qisqa maslahat bering (qaysi mezonlar bo'yicha tanlash kerak)
-            5. Markazlarni student_count (o'quvchilar soni) ko'p bo'lgani yaxshiroq deb hisoblang`;
+            3. Linklarni o'zgartirmang — ular foydalanuvchiga markaz sahifasiga o'tish imkonini beradi
+            4. Agar foydalanuvchining talabiga mos markaz topilmasa — "Afsuski, [shart] bo'yicha mos markaz topilmadi" deb ayting
+            5. Tavsiyadan keyin qisqa maslahat bering (qaysi mezonlar bo'yicha tanlash kerak)
+            6. Markazlarni student_count (o'quvchilar soni) ko'p bo'lgani yaxshiroq deb hisoblang`;
                 }
 
                 return `${base}
@@ -792,19 +751,7 @@
         /* ═══════════════════════════════════════════
         UI YANGILASH
         ═══════════════════════════════════════════ */
-        function updProg(n) {
-            const pct = Math.min(n / MAX_MSGS * 100, 100);
-            document.getElementById('prog-fill').style.width = pct + '%';
-            document.getElementById('prog-txt').textContent = n + '/' + MAX_MSGS;
-            document.getElementById('tb-sub').textContent = n + '/' + MAX_MSGS + ' xabar';
-        }
-
-        function updBanner(isFull) {
-            const b = document.getElementById('full-banner');
-            isFull ? b.classList.add('show') : b.classList.remove('show');
-        }
-
-        function updSidebarItem(id, lastMsg, count, isFull) {
+        function updSidebarItem(id, lastMsg) {
             document.getElementById('sess-empty')?.remove();
 
             let el = document.getElementById('si-' + id);
@@ -819,8 +766,7 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${esc(lastMsg.substring(0, 42))}</p>
                             <div class="flex items-center mt-1 space-x-2">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isFull ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'}">${isFull ? 'Yopiq' : 'Faol'}</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">${count}/${MAX_MSGS}</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">Faol</span>
                             </div>
                             <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">${esc(lastMsg.substring(0, 48))}</p>
                         </div>
@@ -829,11 +775,6 @@
             } else {
                 el.classList.add('bg-indigo-50', 'dark:bg-indigo-900/20', 'border-indigo-200', 'dark:border-indigo-700');
                 el.classList.remove('border-transparent');
-                const meta = el.querySelector('.inline-flex');
-                if (meta) {
-                    meta.className = `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isFull ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'}`;
-                    meta.textContent = isFull ? 'Yopiq' : 'Faol';
-                }
                 const prev = el.querySelector('.text-xs.text-gray-500');
                 if (prev) prev.textContent = esc(lastMsg.substring(0, 48));
             }

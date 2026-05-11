@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChatSession extends Model
 {
-    protected $fillable = ['user_id', 'title', 'status', 'message_count'];
+    protected $fillable = ['user_id', 'title', 'status'];
 
-    const MAX_MESSAGES = 15; // Bitta sessiondagi maksimal xabar soni
+    // Cheklov olib tashlandi — cheksiz xabar yozish mumkin
 
     public function user()
     {
@@ -28,6 +28,6 @@ class ChatSession extends Model
 
     public function isFull(): bool
     {
-        return $this->message_count >= self::MAX_MESSAGES;
+        return false;
     }
 }

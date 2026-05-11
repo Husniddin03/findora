@@ -90,7 +90,7 @@ class ChatController extends Controller
                 ->where('id', $request->session_id)->first();
         }
 
-        if (!$session || $session->isFull()) {
+        if (!$session) {
             $session = ChatSession::create([
                 'user_id' => $userId,
                 'title' => mb_substr($request->user_message, 0, 45),
@@ -103,102 +103,95 @@ class ChatController extends Controller
             ['user_id' => $userId, 'session_id' => $session->id, 'role' => 'assistant', 'content' => $request->ai_response, 'model' => $model, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        $newCount = $session->message_count + 2;
-        $session->update([
-            'message_count' => $newCount,
-            'status' => $newCount >= ChatSession::MAX_MESSAGES ? 'closed' : 'active',
-        ]);
-
         return response()->json([
             'ok' => true,
             'session_id' => $session->id,
-            'is_full' => $session->fresh()->isFull(),
         ]);
     }
 
-    /* ── MARKAZ QIDIRISH — sof MySQL LIKE, hech qanday paket yo'q ── */
+    /* ── MARKAZ QIDIRISH — Token API orqali ── */
 
     public function searchCenters(Request $request)
     {
         $request->validate(['keywords' => 'required|array']);
         $kw = $request->keywords;
 
-        $province = $kw['province'] ?? null;   // viloyat nomi
-        $subjects = $kw['subjects'] ?? [];     // fanlar ro'yxati
-        $query = $kw['query'] ?? null;   // umumiy qidiruv matni
-
-        $q = LearningCenter::query()
-            ->with(['subjects.subject', 'teachers'])
-            ->select('id', 'name', 'type', 'about', 'province', 'region', 'address', 'student_count');
-
-        // 1. Viloyat bo'yicha filter
-        if ($province) {
-            $q->where('province', 'LIKE', "%{$province}%");
+        $token = env('DEFAULT_TOKEN');
+        if (!$token) {
+            return response()->json([
+                'ok' => false,
+                'error' => 'API token not configured'
+            ], 500);
         }
 
-        // 2. Fan nomi bo'yicha JOIN filter
-        if (!empty($subjects)) {
-            $q->where(function ($outer) use ($subjects) {
-                // subjects_of_learning_centers → subjects jadvalidan qidirish
-                $outer->whereHas('subjects.subject', function ($inner) use ($subjects) {
-                    $inner->where(function ($sub) use ($subjects) {
-                        foreach ($subjects as $s) {
-                            $sub->orWhere('name', 'LIKE', "%{$s}%");
-                        }
-                    });
-                });
-            });
+        // API endpointga so'rov parametrlarini tayyorlash
+        $params = [
+            'searchText' => $kw['query'] ?? '',
+            'per_page' => 8,
+        ];
+
+        if (!empty($kw['province'])) {
+            $params['searchText'] .= ' ' . $kw['province'];
         }
 
-        // 3. Umumiy matn qidiruvi (nom, haqida, manzil)
-        if ($query) {
-            $q->where(function ($w) use ($query) {
-                $w->where('name', 'LIKE', "%{$query}%")
-                    ->orWhere('about', 'LIKE', "%{$query}%")
-                    ->orWhere('address', 'LIKE', "%{$query}%");
-            });
+        if (!empty($kw['subjects'])) {
+            $params['searchText'] .= ' ' . implode(' ', $kw['subjects']);
         }
 
-        // 4. Eng ko'p o'quvchisi bo'lgan markazlarni ustiga qo'yish
-        $centers = $q->orderByDesc('student_count')->limit(8)->get();
+        try {
+            $response = Http::get(url('/api/data/' . $token), $params);
 
-        // 5. Viloyat bo'yicha hech narsa topilmasa — kengaytirilgan qidiruv
-        if ($centers->isEmpty() && $province) {
-            $centers = LearningCenter::with(['subjects.subject', 'teachers'])
-                ->select('id', 'name', 'type', 'about', 'province', 'region', 'address', 'student_count')
-                ->where('province', 'LIKE', "%{$province}%")
-                ->orderByDesc('student_count')
-                ->limit(8)
-                ->get();
+            if (!$response->successful()) {
+                return response()->json([
+                    'ok' => false,
+                    'error' => 'API request failed'
+                ], 500);
+            }
+
+            $data = $response->json();
+
+            if (!$data['success']) {
+                return response()->json([
+                    'ok' => false,
+                    'error' => $data['error'] ?? 'Unknown error'
+                ], 500);
+            }
+
+            $centers = collect($data['data']);
+
+            // AI uchun kontekst matni (qisqa va aniq, slug bilan)
+            $context = $centers->map(function ($c) {
+                $details = array_filter([
+                    $c['type'] ? "Turi: {$c['type']}" : null,
+                    $c['province'] && $c['region'] ? "{$c['province']}, {$c['region']}" : null,
+                    $c['address'] ? "Manzil: {$c['address']}" : null,
+                    $c['rating'] ? "Reyting: {$c['rating']}" : null,
+                    $c['student_count'] ? "O'quvchilar: {$c['student_count']}" : null,
+                    $c['premium'] ? "Premium" : null,
+                ]);
+
+                $slug = $c['slug'] ?? '';
+                $url = $slug ? url('/center/' . $slug) : '#';
+
+                return implode(' | ', array_filter([
+                    "**[{$c['name']}]({$url})**",
+                    ...$details,
+                ]));
+            })->join("\n");
+
+            return response()->json([
+                'ok' => true,
+                'context' => $context,
+                'count' => $centers->count(),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Search centers API error: ' . $e->getMessage());
+            return response()->json([
+                'ok' => false,
+                'error' => 'API request error'
+            ], 500);
         }
-
-        // 6. AI uchun kontekst matni (qisqa va aniq)
-        $context = $centers->map(function ($c) {
-            $subs = $c->subjects->map(function ($s) {
-                $price = $s->price
-                    ? number_format((int) $s->price, 0, '.', ' ') . " so'm"
-                    : '';
-                return ($s->subject?->name ?? '') . ($price ? " ({$price})" : '');
-            })->filter()->join(', ');
-
-            $teachers = $c->teachers->pluck('name')->join(', ');
-
-            return implode(' | ', array_filter([
-                "#{$c->id} {$c->name} ({$c->type})",
-                "{$c->province}, {$c->region}",
-                $c->address,
-                $c->about ? mb_substr($c->about, 0, 80) : null,
-                $subs ? "Fanlar: {$subs}" : null,
-                $c->student_count ? "O'quvchilar: {$c->student_count}" : null,
-                $teachers ? "O'qituvchilar: {$teachers}" : null,
-            ]));
-        })->join("\n");
-
-        return response()->json([
-            'ok' => true,
-            'context' => $context,
-            'count' => $centers->count(),
-        ]);
     }
 
     /* ── SESSIYA TARIXI ── */
@@ -215,14 +208,12 @@ class ChatController extends Controller
                 'id' => $session->id,
                 'title' => $session->title,
                 'status' => $session->status,
-                'message_count' => $session->message_count,
             ],
             'messages' => $session->messages->map(fn($m) => [
                 'role' => $m->role,
                 'content' => $m->content,
                 'created_at' => $m->created_at->format('H:i'),
             ]),
-            'is_full' => $session->isFull(),
         ]);
     }
 
@@ -236,8 +227,6 @@ class ChatController extends Controller
                 'id' => $s->id,
                 'title' => $s->title,
                 'status' => $s->status,
-                'message_count' => $s->message_count,
-                'is_full' => $s->isFull(),
                 'last_message' => $s->lastMessage
                     ? mb_substr($s->lastMessage->content, 0, 55) : null,
                 'created_at' => $s->created_at->format('d.m H:i'),
@@ -246,7 +235,7 @@ class ChatController extends Controller
         return response()->json(['ok' => true, 'sessions' => $sessions]);
     }
 
-    /* ── AI API PROXY — CORS muammosini oldini oladi ── */
+    /* ── GROQ AI PROXY — CORS muammosini oldini oladi ── */
 
     public function proxyAi(Request $request)
     {
@@ -256,7 +245,7 @@ class ChatController extends Controller
             'max_tokens' => 'nullable|integer',
         ]);
 
-        if (!env('AI_SEARCH_ENABLED')) {
+        if (!config('services.groq.enabled')) {
             return response()->json([
                 'choices' => [
                     ['message' => ['content' => 'AI xizmati vaqtinchalik o‘chirilgan.']]
@@ -265,62 +254,24 @@ class ChatController extends Controller
         }
 
         try {
-            $apiKey = env('AI_SEARCH_KEY');
-            $model = env('AI_SEARCH_MODEL', 'mistralai/Mistral-7B-Instruct-v0.2');
-            $timeout = (int) env('AI_SEARCH_TIMEOUT', 30);
+            $client = \OpenAI::factory()
+                ->withApiKey(config('services.groq.key'))
+                ->withBaseUri('https://api.groq.com/openai/v1')
+                ->make();
 
-            // Hugging Face Inference API (standard format)
-            $url = 'https://api-inference.huggingface.co/models/' . $model;
+            $result = $client->chat()->create([
+                'model' => config('services.groq.model'),
+                'messages' => $request->messages,
+                'temperature' => $request->input('temperature', 0.7),
+                'max_tokens' => $request->input('max_tokens', 2000),
+            ]);
 
-            // Messages ni prompt ga aylantirish
-            $prompt = $this->messagesToPrompt($request->messages);
-
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout($timeout)
-              ->post($url, [
-                  'inputs' => $prompt,
-                  'parameters' => [
-                      'temperature' => $request->input('temperature', 0.7),
-                      'max_new_tokens' => $request->input('max_tokens', 2000),
-                      'return_full_text' => false,
-                  ],
-              ]);
-
-            if ($response->failed()) {
-                Log::error('AI proxy error', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                    'url' => $url,
-                ]);
-                return response()->json([
-                    'choices' => [
-                        ['message' => ['content' => 'AI xizmatida vaqtinchalik nosozlik. Iltimos, keyinroq urinib ko‘ring.']]
-                    ]
-                ], 500);
-            }
-
-            $result = $response->json();
-
-            // Hugging Face inference API response: [[{"generated_text":"..."}]]
-            $text = '';
-            if (is_array($result) && isset($result[0])) {
-                $first = $result[0];
-                if (is_array($first) && isset($first[0]['generated_text'])) {
-                    $text = $first[0]['generated_text'];
-                } elseif (isset($first['generated_text'])) {
-                    $text = $first['generated_text'];
-                }
-            }
-
-            // OpenAI-compatible formatga o‘girish
             return response()->json([
                 'choices' => [
                     [
                         'message' => [
                             'role' => 'assistant',
-                            'content' => trim($text) ?: 'Javob yaratib bo‘lmadi.',
+                            'content' => trim($result->choices[0]->message->content) ?: 'Javob yaratib bo‘lmadi.',
                         ],
                         'finish_reason' => 'stop',
                         'index' => 0,
@@ -328,49 +279,13 @@ class ChatController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            Log::error('AI proxy exception', ['message' => $e->getMessage()]);
+            Log::error('Groq AI proxy xatolik', ['message' => $e->getMessage()]);
             return response()->json([
                 'choices' => [
                     ['message' => ['content' => 'AI xizmatida xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.']]
                 ]
             ], 500);
         }
-    }
-
-    /**
-     * OpenAI messages formatini Hugging Face promptiga aylantirish
-     */
-    private function messagesToPrompt(array $messages): string
-    {
-        $parts = [];
-        foreach ($messages as $msg) {
-            $role = $msg['role'] ?? 'user';
-            $content = $msg['content'] ?? '';
-
-            switch ($role) {
-                case 'system':
-                    $parts[] = "[INST] <<SYS>>\n{$content}\n<</SYS>>\n\n";
-                    break;
-                case 'user':
-                    $parts[] = "{$content} [/INST]";
-                    break;
-                case 'assistant':
-                    $parts[] = "{$content} </s><s>[INST] ";
-                    break;
-                default:
-                    $parts[] = $content;
-            }
-        }
-
-        // Agar system bo‘lmasa, umumiy shaklda qo‘shish
-        $prompt = implode("\n", $parts);
-
-        // Llama/Instruct formatini to‘g‘rilash
-        if (!str_contains($prompt, '[INST]')) {
-            $prompt = "[INST] {$prompt} [/INST]";
-        }
-
-        return $prompt;
     }
 
     /* ── RIASEC ── */

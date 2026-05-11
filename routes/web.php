@@ -23,6 +23,7 @@ use App\Livewire\Admin\Teachers;
 use App\Livewire\Admin\Subjects;
 use App\Livewire\Admin\Comments;
 use App\Livewire\Admin\Images;
+use App\Livewire\Admin\Tokens;
 use Illuminate\Support\Facades\Route;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Illuminate\Support\Str;
@@ -125,16 +126,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/quiz',                  [ChatController::class, 'quiz'])->name('chat.quiz');
     // course uchun route
     Route::resource('course', CourseController::class);
-    // // teacher uchun route lar
-    // Route::post('/teacher/store/{center}', [TeacherController::class, 'store'])->name('teacher.storeid');
-    // Route::get('/teacher/announcement/{center}', [TeacherController::class, 'announcement'])->name('teacher.announcement');
-    // Route::post('/teacher/add_announcement/{center}', [TeacherController::class, 'add_announcement'])->name('teacher.add_announcement');
-    // Route::post('/teacher/delete_announcement/{center}', [TeacherController::class, 'delete_announcement'])->name('teacher.delete_announcement');
-    // Route::resource('teacher', TeacherController::class);
-    // // subject uchun route lar
-    // Route::post('/subject/store/{center}', [SubjectController::class, 'store'])->name('subject.storeid');
-    // Route::resource('subject', SubjectController::class);
-    // comment uchun route lar
+   
     Route::post('comment/store', [CommentController::class, 'store'])->name('comment.store');
     Route::post('comment/delete/{id}', [CommentController::class, 'delete'])->name('comment.delete');
     Route::post('comment/favoriteStore', [CommentController::class, 'favoriteStore'])->name('comment.favoriteStore');
@@ -147,10 +139,7 @@ Route::middleware('auth')->group(function () {
     Route::post('center/weekdayUpdate/{center}', [WeekdaysController::class, 'update'])->name('course.weekdayUpdate');
     Route::post('center/weekdayAdd/{center}', [WeekdaysController::class, 'add'])->name('course.weekdayAdd');
     Route::post('center/weekdayDelete/{id}', [WeekdaysController::class, 'delete'])->name('course.weekdayDelete');
-    // connect uchun route lar
-    // Route::get('connect/edit/{center}', [ConnectController::class, 'edit'])->name('connect.edit');
-    // Route::post('connect/delete/{id}', [ConnectController::class, 'delete'])->name('connect.delete');
-    // Route::post('connect/store/{center}', [ConnectController::class, 'store'])->name('connect.store');
+ 
     // logout uchun route
     Route::post('logout', [LogController::class, 'logout'])->name('logout');
 });
@@ -256,6 +245,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/subjects', Subjects::class)->name('subjects');
     Route::get('/comments', Comments::class)->name('comments');
     Route::get('/images', Images::class)->name('images');
+    Route::get('/tokens', Tokens::class)->name('tokens');
 });
 
 require __DIR__.'/test_bot.php';

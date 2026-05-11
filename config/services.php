@@ -43,18 +43,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | AI Search Service (Optional Enhancement)
+    | Groq AI Service
     |--------------------------------------------------------------------------
-    | Set AI_SEARCH_ENABLED=true in .env and provide a key + URL to activate.
-    | The search system works perfectly WITHOUT this configuration.
-    | Compatible with OpenAI API or any OpenAI-compatible endpoint (Gemini, etc.)
     */
-    'ai_search' => [
-        'enabled' => env('AI_SEARCH_ENABLED', false),
-        'url'     => env('AI_SEARCH_URL', 'https://api.openai.com/v1/chat/completions'),
-        'key'     => env('AI_SEARCH_KEY', ''),
-        'model'   => env('AI_SEARCH_MODEL', 'gpt-4o-mini'),
-        'timeout' => env('AI_SEARCH_TIMEOUT', 4),
+    'groq' => [
+        'enabled' => env('GROQ_ENABLED', true),
+        'key'     => env('GROQ_KEY'),
+        'model'   => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'timeout' => env('GROQ_TIMEOUT', 30),
     ],
 
 ];

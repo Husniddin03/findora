@@ -7,29 +7,62 @@ use App\Models\LearningCenter;
 use App\Models\Token;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class ApiController extends Controller
 {
     /**
      * API endpoint to get LearningCenter data with token authentication
-     * URL: /data/{token}?query=params
+     * URL: /data?query=params&token={token} or Authorization header: Bearer {token}
      */
-    public function data(Request $request, $token): JsonResponse
+    public function data(Request $request): JsonResponse
     {
-        // Validate token
-        $tokenModel = Token::where('token', $token)
-            ->where('is_active', true)
-            ->where(function ($query) {
-                $query->whereNull('expires_at')
-                      ->orWhere('expires_at', '>', now());
-            })
-            ->first();
+        // Try to get token from Authorization header first
+        $authHeader = $request->header('Authorization');
+        $token = null;
 
-        if (!$tokenModel) {
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $token = substr($authHeader, 7);
+        }
+
+        // Fallback to query parameter for backward compatibility
+        if (!$token && $request->has('token')) {
+            $token = $request->query('token');
+        }
+
+        if (!$token) {
             return response()->json([
                 'success' => false,
-                'error' => 'Invalid or expired token'
+                'error' => 'Token required (Authorization: Bearer {token} or ?token={token})'
             ], 401);
+        }
+
+        // Validate token in database
+        $tokenModel = null;
+        try {
+            $tokenModel = Token::where('token', $token)
+                ->where('is_active', true)
+                ->where(function ($query) {
+                    $query->whereNull('expires_at')
+                          ->orWhere('expires_at', '>', now());
+                })
+                ->first();
+
+            if (!$tokenModel) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Invalid or expired token'
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            Log::error('Token validation error', [
+                'error' => $e->getMessage(),
+                'token' => $token ? substr($token, 0, 10) . '...' : 'null'
+            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'Token validation failed'
+            ], 500);
         }
 
         // Validate query parameters
@@ -52,7 +85,12 @@ class ApiController extends Controller
             'per_page' => 'nullable|integer|min:1|max:50',
         ]);
 
-        // Build query
+        // Create cache key from request parameters
+        $cacheKey = 'api:learning_centers:' . md5(json_encode($validated));
+
+        // Try to get from cache first
+        return Cache::remember($cacheKey, 300, function () use ($validated) {
+            // Build query
         $query = LearningCenter::query();
 
         // Search text filter
@@ -184,9 +222,10 @@ class ApiController extends Controller
                 'has_more_pages' => $paginator->hasMorePages(),
             ],
             'token_info' => [
-                'token_name' => $tokenModel->name,
-                'expires_at' => $tokenModel->expires_at?->format('Y-m-d H:i:s'),
+                'token_name' => isset($tokenModel) && $tokenModel ? $tokenModel->name : 'Unknown',
+                'expires_at' => isset($tokenModel) && $tokenModel && $tokenModel->expires_at ? $tokenModel->expires_at->format('Y-m-d H:i:s') : null,
             ],
         ]);
+        });
     }
 }

@@ -118,6 +118,7 @@ class ChatController extends Controller
 
         $token = env('DEFAULT_TOKEN');
         if (!$token) {
+            Log::error('DEFAULT_TOKEN not configured in .env');
             return response()->json([
                 'ok' => false,
                 'error' => 'API token not configured'
@@ -139,9 +140,14 @@ class ChatController extends Controller
         }
 
         try {
-            $response = Http::get(url('/api/data/' . $token), $params);
+            $response = Http::withToken($token)->get(env('APP_URL').'/api/data', $params);
 
             if (!$response->successful()) {
+                Log::error('API request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'params' => $params
+                ]);
                 return response()->json([
                     'ok' => false,
                     'error' => 'API request failed'
@@ -151,6 +157,10 @@ class ChatController extends Controller
             $data = $response->json();
 
             if (!$data['success']) {
+                Log::error('API returned error', [
+                    'error' => $data['error'] ?? 'Unknown error',
+                    'params' => $params
+                ]);
                 return response()->json([
                     'ok' => false,
                     'error' => $data['error'] ?? 'Unknown error'
@@ -259,19 +269,120 @@ class ChatController extends Controller
                 ->withBaseUri('https://api.groq.com/openai/v1')
                 ->make();
 
+            // Tools definition for Function Calling
+            $tools = [
+                [
+                    'type' => 'function',
+                    'function' => [
+                        'name' => 'get_learning_centers',
+                        'description' => "O'quv markazlarini qidirish va ma'lumot olish. Viloyat, fan yoki markaz nomi bo'yicha qidirish mumkin.",
+                        'parameters' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'searchText' => [
+                                    'type' => 'string',
+                                    'description' => 'Fan yoki markaz nomi (masalan: matematika, ingliz tili, dasturlash)',
+                                ],
+                                'province' => [
+                                    'type' => 'string',
+                                    'description' => 'Viloyat nomi (Toshkent, Samarqand, Buxoro, Andijon, Namangan, Farg\'ona, Qashqadaryo, Surxandaryo, Xorazm, Navoiy, Jizzax, Sirdaryo, Qoraqalpog\'iston)',
+                                ],
+                                'type' => [
+                                    'type' => 'string',
+                                    'description' => 'Markaz turi (masalan: IT kurslari, til kurslari, tayyorlov kurslari)',
+                                ],
+                            ],
+                            'required' => [],
+                        ],
+                    ],
+                ],
+            ];
+
             $result = $client->chat()->create([
                 'model' => config('services.groq.model'),
                 'messages' => $request->messages,
                 'temperature' => $request->input('temperature', 0.7),
                 'max_tokens' => $request->input('max_tokens', 2000),
+                'tools' => $tools,
+                'tool_choice' => 'auto',
             ]);
 
+            // Check if AI wants to call a tool
+            $toolCalls = $result->choices[0]->message->toolCalls ?? [];
+
+            if (!empty($toolCalls)) {
+                foreach ($toolCalls as $toolCall) {
+                    if ($toolCall->function->name === 'get_learning_centers') {
+                        // Parse tool arguments
+                        $args = json_decode($toolCall->function->arguments, true);
+
+                        // Call the API to get centers
+                        $token = env('DEFAULT_TOKEN');
+                        if ($token) {
+                            $apiResponse = Http::withToken($token)->get(url('/api/data'), $args);
+
+                            if ($apiResponse->successful()) {
+                                $apiData = $apiResponse->json();
+                                if ($apiData['success'] && !empty($apiData['data'])) {
+                                    // Format centers for AI
+                                    $centersText = collect($apiData['data'])->take(10)->map(function ($c) {
+                                        return "- {$c['name']} ({$c['province']}, {$c['region']}) - Turi: {$c['type']}, Reyting: {$c['rating']}, URL: {$c['detail_url']}";
+                                    })->join("\n");
+
+                                    // Send tool response back to AI
+                                    $messages = $request->messages;
+                                    $messages[] = [
+                                        'role' => 'assistant',
+                                        'content' => null,
+                                        'tool_calls' => [[
+                                            'id' => $toolCall->id,
+                                            'type' => $toolCall->type,
+                                            'function' => [
+                                                'name' => $toolCall->function->name,
+                                                'arguments' => $toolCall->function->arguments,
+                                            ],
+                                        ]],
+                                    ];
+                                    $messages[] = [
+                                        'role' => 'tool',
+                                        'tool_call_id' => $toolCall->id,
+                                        'content' => "Topilgan o'quv markazlar:\n" . $centersText,
+                                    ];
+
+                                    // Get final response from AI with tool context
+                                    $finalResult = $client->chat()->create([
+                                        'model' => config('services.groq.model'),
+                                        'messages' => $messages,
+                                        'temperature' => $request->input('temperature', 0.7),
+                                        'max_tokens' => $request->input('max_tokens', 2000),
+                                    ]);
+
+                                    return response()->json([
+                                        'choices' => [
+                                            [
+                                                'message' => [
+                                                    'role' => 'assistant',
+                                                    'content' => trim($finalResult->choices[0]->message->content) ?: 'Javob yaratib bo\'lmadi.',
+                                                ],
+                                                'finish_reason' => 'stop',
+                                                'index' => 0,
+                                            ]
+                                        ],
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // No tool call or tool failed, return normal response
             return response()->json([
                 'choices' => [
                     [
                         'message' => [
                             'role' => 'assistant',
-                            'content' => trim($result->choices[0]->message->content) ?: 'Javob yaratib bo‘lmadi.',
+                            'content' => trim($result->choices[0]->message->content) ?: "Javob yaratib bo'lmadi.",
                         ],
                         'finish_reason' => 'stop',
                         'index' => 0,
@@ -282,7 +393,7 @@ class ChatController extends Controller
             Log::error('Groq AI proxy xatolik', ['message' => $e->getMessage()]);
             return response()->json([
                 'choices' => [
-                    ['message' => ['content' => 'AI xizmatida xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.']]
+                    ['message' => ['content' => 'AI xizmatida xatolik yuz berdi. Iltimos, keyinroq urinib ko\'ring.']]
                 ]
             ], 500);
         }

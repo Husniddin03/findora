@@ -26,7 +26,7 @@ Route::post('telegram/webhook', [TelegramBotController::class, 'handle']);
 | Token orqali himoyalangan ochiq API routes
 */
 
-Route::get('/data/{token}', [ApiController::class, 'data'])->name('api.data');
+Route::get('/data', [ApiController::class, 'data'])->name('api.data');
 
 /*
 |--------------------------------------------------------------------------

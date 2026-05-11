@@ -371,26 +371,27 @@
                 };
             }
 
-            const prompt = `Sen o'quv markaz qidiruv tizimining filter modulisan.
-            Quyidagi foydalanuvchi so'rovini tahlil qil va FAQAT JSON qaytargin. Hech qanday izoh, matn yoki kod bloki yozma.
+            const prompt = `Siz o'quv markaz qidiruv tizimining filter modulisan.
+            Vazifangiz: foydalanuvchi so'rovini tahlil qilib, qidiruv parametrlarini ajratib olish.
 
-            Qaytariladigan JSON formati:
+            FAQAT va FAQAT quyidagi JSON formatida javob bering. Boshqa hech qanday matn, izoh yoki kod bloki yozmang.
+
             {
-            "needs_search": true,
-            "province": "Toshkent",
-            "subjects": ["matematika", "fizika"],
-            "query": "matematika kursi"
+                "needs_search": true,
+                "province": "Toshkent",
+                "subjects": ["matematika", "fizika"],
+                "query": "matematika kursi"
             }
 
             Qoidalar:
-            - needs_search: agar so'rov o'quv markaz, kurs, dars, ta'lim, o'qish, o'qituvchi bilan bog'liq bo'lsa TRUE, aks holda FALSE
-            - province: faqat quyidagilardan biri yoki null:
-            Toshkent, Samarqand, Buxoro, Andijon, Namangan, Farg'ona,
-            Qashqadaryo, Surxandaryo, Xorazm, Navoiy, Jizzax, Sirdaryo, Qoraqalpog'iston
-            - subjects: o'qitiladigan fanlar ro'yxati (matematika, ingliz tili, dasturlash, fizika va h.k.) — topilmasa bo'sh massiv
+            - needs_search: agar so'rov o'quv markaz, kurs, dars, ta'lim, o'qish, o'qituvchi, universitet, kollej, maktab, til kursi, IT kursi, sport, musiqa yoki shunga o'xshash ta'lim sohasi bilan bog'liq bo'lsa TRUE, aks holda FALSE
+            - province: faqat quyidagilardan biri yoki null: Toshkent, Samarqand, Buxoro, Andijon, Namangan, Farg'ona, Qashqadaryo, Surxandaryo, Xorazm, Navoiy, Jizzax, Sirdaryo, Qoraqalpog'iston
+            - subjects: o'qitiladigan fanlar yoki kurslar ro'yxati (matematika, ingliz tili, dasturlash, fizika, kimyo, biologiya, tarix, geografiya, ona tili, rus tili, arab tili, xitoy tili, IT, robototexnika, grafik dizayn va h.k.) — topilmasa bo'sh massiv
             - query: qidiruv uchun 2-4 ta eng muhim kalit so'z (o'zbek tilida)
 
-            Foydalanuvchi so'rovi: "${userMsg}"`;
+            Foydalanuvchi so'rovi: "${userMsg}"
+
+            JAVOB FAQAT JSON BO'LSIN:`;
 
             try {
                 const response = await fetch(URL_AI, {
@@ -406,7 +407,7 @@
                                 content: prompt
                             }
                         ],
-                        max_tokens: 200,
+                        max_tokens: 300,
                         temperature: 0.1
                     })
                 });
@@ -416,17 +417,48 @@
                 }
 
                 const data = await response.json();
-                const text = data?.choices?.[0]?.message?.content || '';
-                const clean = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
-                
-                return JSON.parse(clean);
+                let text = data?.choices?.[0]?.message?.content || '';
+
+                // JSON ni ajratib olish - har xil formatlarni qo'llab-quvvatlash
+                // 1. Markdown code block ichida bo'lsa
+                const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+                if (codeBlockMatch) {
+                    text = codeBlockMatch[1].trim();
+                }
+
+                // 2. Faqat { va } orasidagi qismni olish
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    text = jsonMatch[0];
+                }
+
+                text = text.trim();
+                const result = JSON.parse(text);
+
+                // Ensure correct types
+                return {
+                    needs_search: Boolean(result.needs_search),
+                    province: result.province || null,
+                    subjects: Array.isArray(result.subjects) ? result.subjects : [],
+                    query: result.query || ''
+                };
             } catch (error) {
                 console.error('Keyword extraction error:', error);
+                // Fallback: oddiy qoida asosida aniqlash
+                const lowerMsg = userMsg.toLowerCase();
+                const educationKeywords = ['markaz', 'kurs', 'o\'qish', 'ta\'lim', 'dars', 'fan', 'matematika', 'fizika', 'ingliz', 'dasturlash', 'universitet', 'kollej', 'maktab', 'sinf', 'o\'qituvchi', 'til', 'it ', 'robototexnika', 'grafik', 'dizayn', 'smm', 'buxgalteriya', 'buxgalter', 'narx', 'arzon', 'qimmat', 'yaxshi', 'reyting'];
+                const provinces = ['toshkent', 'samarqand', 'buxoro', 'andijon', 'namangan', 'farg\'ona', 'qashqadaryo', 'surxandaryo', 'xorazm', 'navoiy', 'jizzax', 'sirdaryo', 'qoraqalpog\'iston'];
+                
+                const hasProvince = provinces.some(p => lowerMsg.includes(p));
+                const hasEducation = educationKeywords.some(k => lowerMsg.includes(k));
+
+                console.log('Fallback - hasProvince:', hasProvince, 'hasEducation:', hasEducation, 'msg:', lowerMsg);
+                
                 return {
-                    needs_search: false,
-                    province: null,
+                    needs_search: hasProvince || hasEducation,
+                    province: hasProvince ? provinces.find(p => lowerMsg.includes(p)) : null,
                     subjects: [],
-                    query: ''
+                    query: userMsg.substring(0, 100)
                 };
             }
         } /* ═══════════════════════════════════════════
@@ -485,25 +517,35 @@
             inp.disabled = true;
 
             const typingEl = appendTyping();
+            let fullResp = '';
+            let centerContext = '';
+            let foundCount = 0;
 
             try {
-                /* ── 1. Keyword extraction ── */
-                const kw = await extractKeywords(msg);
+                /* ── 1. Keyword extraction (xatolik bo'lsa ham davom etadi) ── */
+                let kw;
+                try {
+                    kw = await extractKeywords(msg);
+                } catch (e) {
+                    console.error('extractKeywords error:', e);
+                    kw = { needs_search: false, province: null, subjects: [], query: '' };
+                }
 
-                /* ── 2. Markaz qidirish (kerak bo'lsa) ── */
-                let centerContext = '';
-                let foundCount = 0;
-
+                /* ── 2. Markaz qidirish (kerak bo'lsa, xatolik bo'lsa ham davom etadi) ── */
                 if (kw.needs_search) {
-                    const result = await searchCenters({
-                        province: kw.province,
-                        subjects: kw.subjects,
-                        query: kw.query || msg,
-                    });
+                    try {
+                        const result = await searchCenters({
+                            province: kw.province,
+                            subjects: kw.subjects,
+                            query: kw.query || msg,
+                        });
 
-                    if (result) {
-                        foundCount = result.count;
-                        centerContext = result.context;
+                        if (result) {
+                            foundCount = result.count;
+                            centerContext = result.context;
+                        }
+                    } catch (e) {
+                        console.error('searchCenters error:', e);
                     }
                 }
 
@@ -541,27 +583,50 @@
                 }
 
                 const data = await response.json();
-                const fullResp = data?.choices?.[0]?.message?.content || '';
+                fullResp = data?.choices?.[0]?.message?.content || '';
 
                 typingEl.remove();
 
                 const aiEl = appendMsg('ai', fullResp, false);
                 const aiMd = aiEl.querySelector('.ai-md');
-                aiMd.innerHTML = marked.parse(fullResp);
+                if (aiMd) aiMd.innerHTML = marked.parse(fullResp);
                 scrollBot();
 
-                /* ── 5. Mahalliy tarixni yangilash ── */
-                localHistory.push({
-                    role: 'user',
-                    content: msg.substring(0, 400)
-                });
-                localHistory.push({
-                    role: 'assistant',
-                    content: fullResp.substring(0, 400)
-                });
-                if (localHistory.length > 12) localHistory = localHistory.slice(-12);
+            } catch (err) {
+                typingEl?.remove();
+                hideSearchIndicator();
+                
+                // Aniqroq xatolik xabarlari
+                let errorMsg = 'Kechirasiz, xatolik yuz berdi. Iltimos, keyinroq urinib ko\'ring.';
+                
+                if (err.message && err.message.includes('fetch')) {
+                    errorMsg = 'Internet bilan bog\'lanishda xatolik. Internet aloqangizni tekshiring.';
+                } else if (err.message && err.message.includes('timeout')) {
+                    errorMsg = 'Server javob berishda kechikyapti. Iltimos, birozdan so\'ng urinib ko\'ring.';
+                } else if (err.message && err.message.includes('rate limit')) {
+                    errorMsg = 'So\'rovlar limiti tugadi. Iltimos, birozdan so\'ng urinib ko\'ring.';
+                } else if (err.message) {
+                    errorMsg = `Xatolik: ${err.message}`;
+                }
+                
+                fullResp = errorMsg;
+                appendMsg('ai', fullResp);
+                console.error(err);
+            }
 
-                /* ── 6. DB ga saqlash ── */
+            /* ── 5. Mahalliy tarixni yangilash (har doim) ── */
+            localHistory.push({
+                role: 'user',
+                content: msg.substring(0, 400)
+            });
+            localHistory.push({
+                role: 'assistant',
+                content: fullResp.substring(0, 400)
+            });
+            if (localHistory.length > 12) localHistory = localHistory.slice(-12);
+
+            /* ── 6. DB ga saqlash (har doim urinib ko'radi) ── */
+            try {
                 const saved = await api(URL_SAVE, 'POST', {
                     session_id: currentSID,
                     user_message: msg,
@@ -573,17 +638,13 @@
                     currentSID = saved.session_id;
                     updSidebarItem(currentSID, msg);
                 }
-
-            } catch (err) {
-                typingEl?.remove();
-                hideSearchIndicator();
-                appendMsg('ai', '{{ __('chat.messages.error') }}');
-                console.error(err);
-            } finally {
-                document.getElementById('send-btn').disabled = false;
-                inp.disabled = false;
-                inp.focus();
+            } catch (e) {
+                console.error('saveChat error:', e);
             }
+
+            document.getElementById('send-btn').disabled = false;
+            inp.disabled = false;
+            inp.focus();
         }
 
         /* ═══════════════════════════════════════════

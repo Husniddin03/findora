@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\SubjectController as AdminSubjectController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\CenterManageController;
-use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Bot\TelegramBotController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,14 +18,6 @@ Route::middleware(['auth'])->post('/user/heartbeat', function () {
 
 Route::post('telegram/webhook', [TelegramBotController::class, 'handle']);
 
-/*
-|--------------------------------------------------------------------------
-| Public API Routes with Token Authentication
-|--------------------------------------------------------------------------
-| Token orqali himoyalangan ochiq API routes
-*/
-
-Route::get('/data', [ApiController::class, 'data'])->name('api.data');
 
 /*
 |--------------------------------------------------------------------------

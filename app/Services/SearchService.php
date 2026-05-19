@@ -558,13 +558,14 @@ class SearchService
 
     /**
      * Apply type filter (school, university, course, etc.)
+     * Uses LIKE for flexible matching
      */
     private function applyTypeFilter(Builder $query, array $filters): Builder
     {
         $type = $filters['type'] ?? null;
 
         if (!empty($type)) {
-            $query->where('type', $type);
+            $query->where('type', 'like', '%' . $type . '%');
         }
 
         return $query;

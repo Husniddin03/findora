@@ -1,132 +1,87 @@
+@php
+    $apiKey = env('DEFAULT_TOKEN');
+@endphp
+
 <x-layout>
 <x-slot:title>{{ __('quiz.title') }}</x-slot:title>
 
 <style>
-.ai-response-box h2 { color: #f1f5f9; font-size: 1rem; margin: .8rem 0 .4rem; border-bottom: 1px solid #475569; padding-bottom: .4rem; }
-.ai-response-box h3 { color: #94a3b8; font-size: .88rem; margin: .6rem 0 .3rem; }
-.ai-response-box ul,.ai-response-box ol { margin-left: 1.2rem; margin-top: .3rem; }
-.ai-response-box li { margin-bottom: .3rem; }
-.ai-response-box p { margin-bottom: .5rem; }
-.ai-response-box strong { color: #f1f5f9; }
-.ai-response-box code { background:rgba(255,255,255,.06); padding:1px 5px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:.8rem; color:#a5c8ff; }
-
-/* Light mode styles */
-.light-mode .bg-slate-950 { background-color: #ffffff !important; }
-.light-mode .bg-slate-800 { background-color: #f8fafc !important; }
-.light-mode .bg-slate-900 { background-color: #ffffff !important; }
-.light-mode .bg-slate-700\/10 { background-color: rgba(241,245,249,0.1) !important; }
-.light-mode .bg-slate-700\/30 { background-color: rgba(241,245,249,0.3) !important; }
-.light-mode .bg-slate-800\/50 { background-color: rgba(248,250,252,0.5) !important; }
-
-.light-mode .text-slate-300 { color: #475569 !important; }
-.light-mode .text-slate-100 { color: #1e293b !important; }
-.light-mode .text-slate-500 { color: #64748b !important; }
-.light-mode .text-slate-400 { color: #64748b !important; }
-
-.light-mode .border-slate-700 { border-color: #e2e8f0 !important; }
-.light-mode .border-slate-600 { border-color: #cbd5e1 !important; }
-.light-mode .border-slate-500\/20 { border-color: rgba(59,130,246,0.2) !important; }
-
-.light-mode .bg-blue-500\/10 { background-color: rgba(59,130,246,0.1) !important; }
-.light-mode .bg-blue-500\/20 { background-color: rgba(59,130,246,0.2) !important; }
-.light-mode .text-blue-500 { color: #3b82f6 !important; }
-.light-mode .border-blue-500\/22 { border-color: rgba(59,130,246,0.22) !important; }
-.light-mode .border-blue-500 { border-color: #3b82f6 !important; }
-
-.light-mode .bg-emerald-500\/15 { background-color: rgba(16,185,129,0.15) !important; }
-.light-mode .text-emerald-500 { color: #10b981 !important; }
-
-.light-mode .bg-red-500\/8 { background-color: rgba(239,68,68,0.08) !important; }
-.light-mode .border-red-500\/15 { border-color: rgba(239,68,68,0.15) !important; }
-.light-mode .text-red-400 { color: #ef4444 !important; }
-
-.light-mode .bg-gradient-to-r { 
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
-}
-
-/* ═══════════════════════════════════════════
-   THEME MANAGEMENT
-═══════════════════════════════════════════ */
-function initTheme() {
-    const container = document.getElementById('quiz-container');
-    const saved = localStorage.getItem('quiz-theme');
-    
-    // Check if user has saved preference
-    if (saved === 'light') {
-        container.classList.remove('dark-mode');
-        container.classList.add('light-mode');
-    } else {
-        container.classList.remove('light-mode');
-        container.classList.add('dark-mode');
-        localStorage.setItem('quiz-theme', 'dark'); // default to dark
+    /* Enhanced AI response box styles */
+    .ai-response-box {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        border-radius: 12px;
+        padding: 1.5rem;
+        color: #e2e8f0;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(71, 85, 105, 0.1);
+        backdrop-filter: blur(8px);
+        min-height: 120px;
     }
-}
-
-function toggleTheme() {
-    const container = document.getElementById('quiz-container');
-    const isDark = container.classList.contains('dark-mode');
-    
-    if (isDark) {
-        container.classList.remove('dark-mode');
-        container.classList.add('light-mode');
-        localStorage.setItem('quiz-theme', 'light');
-    } else {
-        container.classList.remove('light-mode');
-        container.classList.add('dark-mode');
-        localStorage.setItem('quiz-theme', 'dark');
+    .ai-response-box h2 {
+        font-size: 1.25rem;
+        color: #60a5fa;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
     }
-}
-
-// Add theme toggle button
-function addThemeToggle() {
-    const hero = document.querySelector('.text-center.animate-fade-in');
-    if (!hero) return;
-    
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'fixed top-6 right-6 w-10 h-10 rounded-lg bg-slate-700/50 border border-slate-600 flex items-center justify-center transition-all duration-200 hover:bg-slate-600/50 hover:border-slate-500 z-50';
-    toggleBtn.onclick = toggleTheme;
-    toggleBtn.title = '{{ __('quiz.theme.toggle_title') }}';
-    toggleBtn.innerHTML = `
-        <svg class="w-5 h-5 text-slate-300 dark-mode-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-        </svg>
-        <svg class="w-5 h-5 text-slate-300 light-mode-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-    `;
-    
-    document.body.appendChild(toggleBtn);
-    updateThemeIcon();
-}
-
-function updateThemeIcon() {
-    const container = document.getElementById('quiz-container');
-    const darkIcon = document.querySelector('.dark-mode-icon');
-    const lightIcon = document.querySelector('.light-mode-icon');
-    
-    if (container.classList.contains('dark-mode')) {
-        darkIcon?.classList.remove('hidden');
-        lightIcon?.classList.add('hidden');
-    } else {
-        darkIcon?.classList.add('hidden');
-        lightIcon?.classList.remove('hidden');
+    .ai-response-box h3 {
+        font-size: 1.1rem;
+        color: #a78bfa;
+        margin: 1rem 0 0.5rem 0;
+        font-weight: 600;
     }
-}
+    .ai-response-box p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0.75rem;
+        color: #cbd5e1;
+    }
+    .ai-response-box ul {
+        margin: 0.5rem 0 0.75rem 1.5rem;
+    }
+    .ai-response-box li {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 0.4rem;
+        color: #cbd5e1;
+    }
+    .ai-response-box strong {
+        color: #e2e8f0;
+        font-weight: 600;
+    }
+    .ai-response-box code {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: #a78bfa;
+    }
 
-// Override the original toggleTheme function to also update icon
-const originalToggleTheme = toggleTheme;
-toggleTheme = function() {
-    originalToggleTheme();
-    updateThemeIcon();
-}
+    /* Enhanced chart styles */
+    canvas#resultChart {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.6));
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(71, 85, 105, 0.1);
+        backdrop-filter: blur(8px);
+    }
 
-/* Dark mode - default (slate colors already work) */
-.dark-mode .ai-response-box h2 { color: #f1f5f9; }
-.dark-mode .ai-response-box h3 { color: #94a3b8; }
-.dark-mode .ai-response-box strong { color: #f1f5f9; }
-.dark-mode .ai-response-box code { color: #a5c8ff; }
+    /* Score bars animation */
+    .score-row {
+        animation: slideIn 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
 </style>
-
 
 <div class="font-sans bg-slate-950 min-h-screen p-4 md:p-8 relative overflow-x-hidden dark-mode" id="quiz-container">
     <!-- Orbs -->
@@ -234,10 +189,13 @@ toggleTheme = function() {
             <!-- AI Tavsiya -->
             <div class="p-6 border-t border-slate-700">
                 <div class="flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-slate-500 mb-4">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4M12 8h.01"/>
+                    </svg>
                     {{ __('quiz.ai.title') }}
                 </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-5 text-sm leading-relaxed text-slate-400 min-h-20 ai-response-box" id="ai-response">
+                <div class="ai-response-box" id="ai-response">
                     <div class="flex gap-1 items-center p-1">
                         <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
                         <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.2s"></span>
@@ -253,7 +211,10 @@ toggleTheme = function() {
         @if($history->count())
         <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden animate-fade-in overflow-x-auto">
             <div class="p-4 border-b border-slate-700 flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-slate-500">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M12 6v6l4 2"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
                 <!-- Oldingi natijalar ({{ $history->count() }} ta) -->
                  {{__('quiz.history.title', ['count' => $history->count()])}}
             </div>
@@ -310,6 +271,8 @@ toggleTheme = function() {
 <script>
 const SAVE_URL = '{{ route('riasec.save') }}';
 const CSRF     = '{{ csrf_token() }}';
+const URL_AI   = '{{ route('chat.ai-proxy') }}';
+const API_KEY  = '{{ $apiKey }}';
 
 const questions = [
     "{{ __('quiz.question_list.0') }}",
@@ -436,7 +399,36 @@ function submitTest() {
         }, 0) / 4 * 100;
     }
 
+    // Natijani saqlash
+    saveResult(scores);
+
     showResult(scores);
+}
+
+async function saveResult(scores) {
+    try {
+        const response = await fetch(SAVE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF
+            },
+            body: JSON.stringify({
+                r_score: Math.round(scores.R),
+                i_score: Math.round(scores.I),
+                a_score: Math.round(scores.A),
+                s_score: Math.round(scores.S),
+                e_score: Math.round(scores.E),
+                c_score: Math.round(scores.C)
+            })
+        });
+        const data = await response.json();
+        if (!data.ok) {
+            console.error('Save failed:', data.error);
+        }
+    } catch (err) {
+        console.error('Save error:', err);
+    }
 }
 
 function showResult(scores) {
@@ -448,10 +440,12 @@ function showResult(scores) {
     // Score bars
     const barsEl = document.getElementById('score-bars');
     barsEl.innerHTML = '';
+    let delay = 0;
     for (const t in scores) {
         const pct = Math.round(scores[t]);
         const row = document.createElement('div');
         row.className = 'score-row flex items-center gap-3';
+        row.style.animationDelay = `${delay}ms`;
         row.innerHTML = `
             <div class="score-label w-32 flex-shrink-0 text-xs text-slate-400">
                 <strong class="text-slate-100">${t}</strong> ${typeDesc[t]}
@@ -461,7 +455,8 @@ function showResult(scores) {
             </div>
             <div class="score-pct w-9 text-right text-xs font-bold font-mono" style="color:${typeColors[t]}">${pct}%</div>`;
         barsEl.appendChild(row);
-        setTimeout(() => { document.getElementById(`fill-${t}`).style.width = pct + '%'; }, 100);
+        setTimeout(() => { document.getElementById(`fill-${t}`).style.width = pct + '%'; }, 100 + delay);
+        delay += 100;
     }
 
     // Chart
@@ -474,23 +469,53 @@ function showResult(scores) {
                 data: Object.values(scores).map(v => Math.round(v)),
                 backgroundColor: Object.keys(scores).map(k => typeColors[k] + 'cc'),
                 borderColor:     Object.keys(scores).map(k => typeColors[k]),
-                borderWidth: 2, borderRadius: 8, borderSkipped: false
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+                hoverBackgroundColor: Object.keys(scores).map(k => typeColors[k])
             }]
         },
         options: {
-            responsive: true, maintainAspectRatio: true,
+            responsive: true,
+            maintainAspectRatio: true,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
             plugins: {
                 legend: { display: false },
-                tooltip: { callbacks: { label: ctx => ctx.parsed.y + '%' } }
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#e2e8f0',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(71, 85, 105, 0.5)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: ctx => ctx.parsed.y + '%'
+                    }
+                }
             },
             scales: {
                 y: {
-                    beginAtZero: true, max: 100,
-                    ticks: { callback: v => v+'%', color: '#64748b', font:{size:11} },
-                    grid: { color:'rgba(255,255,255,.05)' }
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: v => v+'%',
+                        color: '#94a3b8',
+                        font: { size: 11, family: 'Inter, system-ui' }
+                    },
+                    grid: {
+                        color: 'rgba(71, 85, 105, 0.2)',
+                        drawBorder: false
+                    }
                 },
                 x: {
-                    ticks: { color: '#cbd5e1', font:{size:11} },
+                    ticks: {
+                        color: '#cbd5e1',
+                        font: { size: 11, family: 'Inter, system-ui' }
+                    },
                     grid: { display: false }
                 }
             }
@@ -503,65 +528,71 @@ function showResult(scores) {
 
 async function askAI(scores) {
     const aiBox = document.getElementById('ai-response');
-    aiBox.innerHTML = '<div class="flex gap-1 items-center p-1">{{ __('quiz.ai.typing.dots') }}</div>';
+    aiBox.innerHTML = '<div class="flex gap-1 items-center p-1"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.2s"></span><span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style="animation-delay:.4s"></span></div>';
 
-    const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+    const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
-    const prompt = `{{ __('quiz.ai.prompt.intro') }}
+    const prompt = `Siz RIASEC karyera testi natijalarini tahlil qiluvchi AI maslahatchisiz.
 
-{{ __('quiz.ai.prompt.results_title') }}:
-- Realistic ({{ __('quiz.legend.realistic_desc') }}): ${Math.round(scores.R)}%
-- Investigative ({{ __('quiz.legend.investigative_desc') }}): ${Math.round(scores.I)}%
-- Artistic ({{ __('quiz.legend.artistic_desc') }}): ${Math.round(scores.A)}%
-- Social ({{ __('quiz.legend.social_desc') }}): ${Math.round(scores.S)}%
-- Enterprising ({{ __('quiz.legend.enterprising_desc') }}): ${Math.round(scores.E)}%
-- Conventional ({{ __('quiz.legend.conventional_desc') }}): ${Math.round(scores.C)}%
+Foydalanuvchi natijalari:
+- Realistic (R): ${Math.round(scores.R)}%
+- Investigative (I): ${Math.round(scores.I)}%
+- Artistic (A): ${Math.round(scores.A)}%
+- Social (S): ${Math.round(scores.S)}%
+- Enterprising (E): ${Math.round(scores.E)}%
+- Conventional (C): ${Math.round(scores.C)}%
 
-{{ __('quiz.ai.prompt.best_type') }}: ${sorted[0][0]} (${Math.round(sorted[0][1])}%), ${sorted[1][0]} (${Math.round(sorted[1][1])}%), ${sorted[2][0]} (${Math.round(sorted[2][1])}%)
+Eng yuqori natijalar: ${sorted[0][0]} (${Math.round(sorted[0][1])}%), ${sorted[1][0]} (${Math.round(sorted[1][1])}%), ${sorted[2][0]} (${Math.round(sorted[2][1])}%)
 
-{{ __('quiz.ai.prompt.format_title') }} ({{ __('quiz.ai.prompt.language') }}, {{ __('quiz.ai.prompt.clear') }}):
-
-## 📊 {{ __('quiz.ai.prompt.analysis_title') }}
-[3-6 jumlada xulosa]
-## 💼 {{ __('quiz.ai.prompt.recommended_careers') }}
-[5-6 ta aniq kasb nomi va qisqacha izoh]
-## 🎓 {{ __('quiz.ai.prompt.development_directions') }}
+Javob formati (faqat O'zbek tilida):
+## 📊 Tahlil
+[3-6 ta gap]
+## 💼 Karyera yo'nalishlari
+[5-6 ta karyera]
+## 🎓 Rivojlanish yo'nalishlari
 [3-4 ta yo'nalish]
-## ⭐ {{ __('quiz.ai.prompt.strengths') }}
-[3 ta]
-
-## 📈 Rivojlantirish uchun
-[2 ta maslahat]`;
+## ⭐ Kuchli tomonlar
+[3 ta kuchli tomon]
+## 📈 Takliflar
+[2 ta taklif]`;
 
     try {
-        let full = '';
-        const response = await puter.ai.chat(prompt, { model: 'deepseek/deepseek-r1', stream: true });
-        aiBox.innerHTML = '';
-
-        for await (const part of response) {
-            if (part?.text) {
-                full += part.text;
-                aiBox.innerHTML = marked.parse(full);
-            }
-        }
-
-        // Bazaga saqlash
-        await fetch(SAVE_URL, {
+        const response = await fetch(URL_AI, {
             method: 'POST',
-            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': CSRF },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF
+            },
             body: JSON.stringify({
-                r_score: Math.round(scores.R),
-                i_score: Math.round(scores.I),
-                a_score: Math.round(scores.A),
-                s_score: Math.round(scores.S),
-                e_score: Math.round(scores.E),
-                c_score: Math.round(scores.C),
-                ai_recommendation: full
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Siz RIASEC karyera testi natijalarini tahlil qiluvchi professional AI maslahatchisiz. Javoblarni faqat O\'zbek tilida bering.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: 1500,
+                temperature: 0.7
             })
         });
 
-    } catch(err) {
-        aiBox.innerHTML = '<span class="text-red-400">❌ Xatolik yuz berdi.</span>';
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const aiText = data?.choices?.[0]?.message?.content || '';
+
+        if (aiText) {
+            aiBox.innerHTML = marked.parse(aiText);
+        } else {
+            aiBox.innerHTML = '<span class="text-red-400">❌ AI javobi olinmadi.</span>';
+        }
+    } catch (err) {
+        aiBox.innerHTML = '<span class="text-red-400">❌ Xatolik yuz berdi. Iltimos, keyinroq urinib ko\'ring.</span>';
         console.error(err);
     }
 }

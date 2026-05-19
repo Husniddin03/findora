@@ -13,10 +13,10 @@ use App\Models\Teacher;
 use App\Models\TeacherSubject;
 use App\Services\ChatService;
 use App\Services\QuizService;
+use App\Services\SearchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
@@ -109,82 +109,48 @@ class ChatController extends Controller
         ]);
     }
 
-    /* ── MARKAZ QIDIRISH — Token API orqali ── */
+    /* ── MARKAZ QIDIRISH — SearchService orqali to'g'ridan-to'g'ri DB ── */
 
-    public function searchCenters(Request $request)
+    public function searchCenters(Request $request, SearchService $searchService)
     {
         $request->validate(['keywords' => 'required|array']);
         $kw = $request->keywords;
 
-        $token = env('DEFAULT_TOKEN');
-        if (!$token) {
-            Log::error('DEFAULT_TOKEN not configured in .env');
-            return response()->json([
-                'ok' => false,
-                'error' => 'API token not configured'
-            ], 500);
-        }
-
-        // API endpointga so'rov parametrlarini tayyorlash
-        $params = [
+        // SearchService uchun parametrlarni tayyorlash
+        $filters = [
             'searchText' => $kw['query'] ?? '',
             'per_page' => 8,
         ];
 
         if (!empty($kw['province'])) {
-            $params['searchText'] .= ' ' . $kw['province'];
+            $filters['searchText'] .= ' ' . $kw['province'];
         }
 
         if (!empty($kw['subjects'])) {
-            $params['searchText'] .= ' ' . implode(' ', $kw['subjects']);
+            $filters['searchText'] .= ' ' . implode(' ', $kw['subjects']);
         }
 
         try {
-            $response = Http::withToken($token)->get(env('APP_URL').'/api/data', $params);
-
-            if (!$response->successful()) {
-                Log::error('API request failed', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                    'params' => $params
-                ]);
-                return response()->json([
-                    'ok' => false,
-                    'error' => 'API request failed'
-                ], 500);
-            }
-
-            $data = $response->json();
-
-            if (!$data['success']) {
-                Log::error('API returned error', [
-                    'error' => $data['error'] ?? 'Unknown error',
-                    'params' => $params
-                ]);
-                return response()->json([
-                    'ok' => false,
-                    'error' => $data['error'] ?? 'Unknown error'
-                ], 500);
-            }
-
-            $centers = collect($data['data']);
+            // To'g'ridan-to'g'ri DB qidiruvi (HTTP API o'rniga)
+            $paginator = $searchService->search($filters);
+            $centers = collect($paginator->items());
 
             // AI uchun kontekst matni (qisqa va aniq, slug bilan)
             $context = $centers->map(function ($c) {
                 $details = array_filter([
-                    $c['type'] ? "Turi: {$c['type']}" : null,
-                    $c['province'] && $c['region'] ? "{$c['province']}, {$c['region']}" : null,
-                    $c['address'] ? "Manzil: {$c['address']}" : null,
-                    $c['rating'] ? "Reyting: {$c['rating']}" : null,
-                    $c['student_count'] ? "O'quvchilar: {$c['student_count']}" : null,
-                    $c['premium'] ? "Premium" : null,
+                    $c->type ? "Turi: {$c->type}" : null,
+                    $c->province && $c->region ? "{$c->province}, {$c->region}" : null,
+                    $c->address ? "Manzil: {$c->address}" : null,
+                    $c->rating ? "Reyting: {$c->rating}" : null,
+                    $c->student_count ? "O'quvchilar: {$c->student_count}" : null,
+                    $c->premium ? "Premium" : null,
                 ]);
 
-                $slug = $c['slug'] ?? '';
+                $slug = $c->slug ?? '';
                 $url = $slug ? url('/center/' . $slug) : '#';
 
                 return implode(' | ', array_filter([
-                    "**[{$c['name']}]({$url})**",
+                    "**[{$c->name}]({$url})**",
                     ...$details,
                 ]));
             })->join("\n");
@@ -196,10 +162,10 @@ class ChatController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Search centers API error: ' . $e->getMessage());
+            Log::error('Search centers error: ' . $e->getMessage());
             return response()->json([
                 'ok' => false,
-                'error' => 'API request error'
+                'error' => 'Server error'
             ], 500);
         }
     }
@@ -247,7 +213,7 @@ class ChatController extends Controller
 
     /* ── GROQ AI PROXY — CORS muammosini oldini oladi ── */
 
-    public function proxyAi(Request $request)
+    public function proxyAi(Request $request, SearchService $searchService)
     {
         $request->validate([
             'messages' => 'required|array',
@@ -316,61 +282,62 @@ class ChatController extends Controller
                         // Parse tool arguments
                         $args = json_decode($toolCall->function->arguments, true);
 
-                        // Call the API to get centers
-                        $token = env('DEFAULT_TOKEN');
-                        if ($token) {
-                            $apiResponse = Http::withToken($token)->get(url('/api/data'), $args);
+                        // To'g'ridan-to'g'ri DB qidiruvi (HTTP API o'rniga)
+                        try {
+                            $filters = array_merge($args, ['per_page' => 10]);
+                            $paginator = $searchService->search($filters);
+                            $foundCenters = collect($paginator->items());
 
-                            if ($apiResponse->successful()) {
-                                $apiData = $apiResponse->json();
-                                if ($apiData['success'] && !empty($apiData['data'])) {
-                                    // Format centers for AI
-                                    $centersText = collect($apiData['data'])->take(10)->map(function ($c) {
-                                        return "- {$c['name']} ({$c['province']}, {$c['region']}) - Turi: {$c['type']}, Reyting: {$c['rating']}, URL: {$c['detail_url']}";
-                                    })->join("\n");
+                            if ($foundCenters->isNotEmpty()) {
+                                // Format centers for AI
+                                $centersText = $foundCenters->map(function ($c) {
+                                    $url = $c->slug ? route('center', $c->slug) : '#';
+                                    return "- {$c->name} ({$c->province}, {$c->region}) - Turi: {$c->type}, Reyting: {$c->rating}, URL: {$url}";
+                                })->join("\n");
 
-                                    // Send tool response back to AI
-                                    $messages = $request->messages;
-                                    $messages[] = [
-                                        'role' => 'assistant',
-                                        'content' => null,
-                                        'tool_calls' => [[
-                                            'id' => $toolCall->id,
-                                            'type' => $toolCall->type,
-                                            'function' => [
-                                                'name' => $toolCall->function->name,
-                                                'arguments' => $toolCall->function->arguments,
-                                            ],
-                                        ]],
-                                    ];
-                                    $messages[] = [
-                                        'role' => 'tool',
-                                        'tool_call_id' => $toolCall->id,
-                                        'content' => "Topilgan o'quv markazlar:\n" . $centersText,
-                                    ];
-
-                                    // Get final response from AI with tool context
-                                    $finalResult = $client->chat()->create([
-                                        'model' => config('services.groq.model'),
-                                        'messages' => $messages,
-                                        'temperature' => $request->input('temperature', 0.7),
-                                        'max_tokens' => $request->input('max_tokens', 2000),
-                                    ]);
-
-                                    return response()->json([
-                                        'choices' => [
-                                            [
-                                                'message' => [
-                                                    'role' => 'assistant',
-                                                    'content' => trim($finalResult->choices[0]->message->content) ?: 'Javob yaratib bo\'lmadi.',
-                                                ],
-                                                'finish_reason' => 'stop',
-                                                'index' => 0,
-                                            ]
+                                // Send tool response back to AI
+                                $messages = $request->messages;
+                                $messages[] = [
+                                    'role' => 'assistant',
+                                    'content' => null,
+                                    'tool_calls' => [[
+                                        'id' => $toolCall->id,
+                                        'type' => $toolCall->type,
+                                        'function' => [
+                                            'name' => $toolCall->function->name,
+                                            'arguments' => $toolCall->function->arguments,
                                         ],
-                                    ]);
-                                }
+                                    ]],
+                                ];
+                                $messages[] = [
+                                    'role' => 'tool',
+                                    'tool_call_id' => $toolCall->id,
+                                    'content' => "Topilgan o'quv markazlar:\n" . $centersText,
+                                ];
+
+                                // Get final response from AI with tool context
+                                $finalResult = $client->chat()->create([
+                                    'model' => config('services.groq.model'),
+                                    'messages' => $messages,
+                                    'temperature' => $request->input('temperature', 0.7),
+                                    'max_tokens' => $request->input('max_tokens', 2000),
+                                ]);
+
+                                return response()->json([
+                                    'choices' => [
+                                        [
+                                            'message' => [
+                                                'role' => 'assistant',
+                                                'content' => trim($finalResult->choices[0]->message->content) ?: 'Javob yaratib bo\'lmadi.',
+                                            ],
+                                            'finish_reason' => 'stop',
+                                            'index' => 0,
+                                        ]
+                                    ],
+                                ]);
                             }
+                        } catch (\Exception $e) {
+                            Log::error('SearchService error in proxyAi: ' . $e->getMessage());
                         }
                     }
                 }

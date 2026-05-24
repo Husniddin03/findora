@@ -188,6 +188,14 @@
                 @endif
                 <a href="#comments" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">{{ __('center.nav_comments') }}</a>
                 <a href="#contact" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">{{ __('center.nav_contact') }}</a>
+                {{-- edit --}}
+
+                @can('isOun', $LearningCenter)
+                    <a href="{{ route('user.center.manage', $LearningCenter->slug) }}"
+                    class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors whitespace-nowrap">
+                        {{ __('center.edit') }}
+                    </a>
+                @endcan
             </nav>
         </div>
     </div>

@@ -21,92 +21,6 @@ use function PHPUnit\Framework\isNull;
 
 class PageController extends Controller
 {
-    /**
-     * Transliterate between Latin and Cyrillic Uzbek scripts
-     */
-    private function transliterate($text)
-    {
-        $latinToCyrillic = [
-            'a' => 'а',
-            'b' => 'б',
-            'd' => 'д',
-            'e' => 'е',
-            'f' => 'ф',
-            'g' => 'г',
-            'h' => 'ҳ',
-            'i' => 'и',
-            'j' => 'ж',
-            'k' => 'к',
-            'l' => 'л',
-            'm' => 'м',
-            'n' => 'н',
-            'o' => 'о',
-            'p' => 'п',
-            'q' => 'қ',
-            'r' => 'р',
-            's' => 'с',
-            't' => 'т',
-            'u' => 'у',
-            'v' => 'в',
-            'x' => 'х',
-            'y' => 'й',
-            'z' => 'з',
-            'o\'' => 'ў',
-            'g\'' => 'ғ',
-            'sh' => 'ш',
-            'ch' => 'ч',
-            'ng' => 'нг'
-        ];
-
-        $cyrillicToLatin = [
-            'а' => 'a',
-            'б' => 'b',
-            'д' => 'd',
-            'е' => 'e',
-            'ф' => 'f',
-            'г' => 'g',
-            'ҳ' => 'h',
-            'и' => 'i',
-            'ж' => 'j',
-            'к' => 'k',
-            'л' => 'l',
-            'м' => 'm',
-            'н' => 'n',
-            'о' => 'o',
-            'п' => 'p',
-            'қ' => 'q',
-            'р' => 'r',
-            'с' => 's',
-            'т' => 't',
-            'у' => 'u',
-            'в' => 'v',
-            'х' => 'x',
-            'й' => 'y',
-            'з' => 'z',
-            'ў' => 'o\'',
-            'ғ' => 'g\'',
-            'ш' => 'sh',
-            'ч' => 'ch',
-            'нг' => 'ng'
-        ];
-
-        // Check if text contains Latin characters
-        if (preg_match('/[a-zA-Z]/', $text)) {
-            // Transliterate to Cyrillic
-            $result = $text;
-            foreach ($latinToCyrillic as $latin => $cyrillic) {
-                $result = str_replace($latin, $cyrillic, $result);
-            }
-            return $result;
-        } else {
-            // Transliterate to Latin
-            $result = $text;
-            foreach ($cyrillicToLatin as $cyrillic => $latin) {
-                $result = str_replace($cyrillic, $latin, $result);
-            }
-            return $result;
-        }
-    }
     public function index()
     {
         // Cache popular courses and categories for 60 minutes
@@ -118,6 +32,8 @@ class PageController extends Controller
                 ->get();
         });
 
+        $all_centers_count = LearningCenter::count();
+
         $types = Cache::remember('course_types', 60, function () {
             return LearningCenter::distinct()
                 ->pluck('type')
@@ -126,7 +42,7 @@ class PageController extends Controller
                 ->values();
         });
 
-        return view('pages.index', compact('centers', 'types'));
+        return view('pages.index', compact('centers', 'types', 'all_centers_count'));
     }
     /**
      * Main search/grid view - refactored to use SearchService

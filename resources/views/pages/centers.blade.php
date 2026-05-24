@@ -123,7 +123,7 @@
                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                             x-transition:leave-end="opacity-0 -translate-y-2 scale-95" 
                             @click.outside="isPanelOpen = false"
-                            class="mf-panel fixed xl:absolute inset-2 sm:inset-4 xl:inset-auto xl:top-full xl:left-0 xl:mt-2 w-[calc(100%-16px)] sm:w-[calc(100%-32px)] xl:w-[900px] xl:max-w-[calc(100vw-40px)] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 max-h-[90vh] xl:max-h-none overflow-hidden flex flex-col"
+                            class="mf-panel fixed xl:absolute inset-2 sm:inset-4 xl:inset-auto xl:top-full xl:left-0 xl:mt-2 w-[calc(100%-16px)] sm:w-[calc(100%-32px)] xl:w-[900px] xl:max-w-[calc(100vw-40px)] bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 max-h-[90vh] xl:max-h-none overflow-hidden flex flex-col"
                             :class="isFullscreen && 'mf-fullscreen'"
                             style="display:none;">
                             
@@ -158,7 +158,7 @@
                             </div>
 
                             {{-- Map Area --}}
-                            <div class="relative bg-gray-50 dark:bg-gray-900 flex-1 min-h-[350px]"
+                            <div class="relative bg-gray-50 flex-1 min-h-[350px]"
                                 :style="`height: ${mapHeight}px`">
                                 <div id="filterMapEl" class="absolute inset-0 w-full h-full rounded-lg"></div>
                                 
@@ -326,33 +326,33 @@
                             class="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[100]">
                             <div class="py-2">
                                 @if (!isset($validated['name']))
-                                    <button type="button" onclick="applySorting('name', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.sort_name') }} ↑↓</button>
+                                    <button type="button" onclick="applySorting('name', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_name') }} ↑↓</button>
                                 @elseif ($validated['name'] == 'asc')
-                                    <button type="button" onclick="applySorting('name', 'desc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20">{{ __('centers.search_filter.sort_name') }} ↑</button>
+                                    <button type="button" onclick="applySorting('name', 'desc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_name') }} ↑</button>
                                 @elseif ($validated['name'] == 'desc')
-                                    <button type="button" onclick="applySorting('name', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20">{{ __('centers.search_filter.sort_name') }} ↓</button>
+                                    <button type="button" onclick="applySorting('name', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_name') }} ↓</button>
                                 @else
-                                    <button type="button" onclick="applySorting('name', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.sort_name') }} ↑↓</button>
+                                    <button type="button" onclick="applySorting('name', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_name') }} ↑↓</button>
                                 @endif
 
                                 @if (!isset($validated['distance']))
-                                    <button type="button" onclick="applySorting('distance', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.sort_distance') }} ↑↓</button>
+                                    <button type="button" onclick="applySorting('distance', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_distance') }} ↑↓</button>
                                 @elseif ($validated['distance'] == 'asc')
-                                    <button type="button" onclick="applySorting('distance', 'desc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20">{{ __('centers.search_filter.sort_distance') }} ↑</button>
+                                    <button type="button" onclick="applySorting('distance', 'desc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_distance') }} ↑</button>
                                 @elseif ($validated['distance'] == 'desc')
-                                    <button type="button" onclick="applySorting('distance', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20">{{ __('centers.search_filter.sort_distance') }} ↓</button>
+                                    <button type="button" onclick="applySorting('distance', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_distance') }} ↓</button>
                                 @else
-                                    <button type="button" onclick="applySorting('distance', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.sort_distance') }} ↑↓</button>
+                                    <button type="button" onclick="applySorting('distance', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_distance') }} ↑↓</button>
                                 @endif
 
                                 @if (!isset($validated['favorites']))
-                                    <button type="button" onclick="applySorting('favorites', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.sort_rating') }} ↑↓</button>
+                                    <button type="button" onclick="applySorting('favorites', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_rating') }} ↑↓</button>
                                 @elseif ($validated['favorites'] == 'asc')
-                                    <button type="button" onclick="applySorting('favorites', 'desc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20">{{ __('centers.search_filter.sort_rating') }} ↑</button>
+                                    <button type="button" onclick="applySorting('favorites', 'desc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_rating') }} ↑</button>
                                 @elseif ($validated['favorites'] == 'desc')
-                                    <button type="button" onclick="applySorting('favorites', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20">{{ __('centers.search_filter.sort_rating') }} ↓</button>
+                                    <button type="button" onclick="applySorting('favorites', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_rating') }} ↓</button>
                                 @else
-                                    <button type="button" onclick="applySorting('favorites', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.sort_rating') }} ↑↓</button>
+                                    <button type="button" onclick="applySorting('favorites', 'asc'); dropdowns.sort.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.sort_rating') }} ↑↓</button>
                                 @endif
                             </div>
                         </div>
@@ -440,9 +440,9 @@
                             x-transition:leave-end="opacity-0 translate-y-1"
                             class="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[100]">
                             <div class="py-2">
-                                <button type="button" onclick="removeFilter('checked'); dropdowns.verified.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.all_status') }}</button>
-                                <button type="button" onclick="applyFilter('checked', '1'); dropdowns.verified.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.verified_only') }}</button>
-                                <button type="button" onclick="applyFilter('checked', '0'); dropdowns.verified.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ __('centers.search_filter.unverified_only') }}</button>
+                                <button type="button" onclick="removeFilter('checked'); dropdowns.verified.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.all_status') }}</button>
+                                <button type="button" onclick="applyFilter('checked', '1'); dropdowns.verified.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.verified_only') }}</button>
+                                <button type="button" onclick="applyFilter('checked', '0'); dropdowns.verified.close()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">{{ __('centers.search_filter.unverified_only') }}</button>
                             </div>
                         </div>
 
@@ -497,7 +497,7 @@
                             <div class="py-2 max-h-64 overflow-y-auto">
                                 @foreach ($types as $type)
                                     <button type="button" onclick='applyFilter("type", "{{ $type }}"); dropdowns.type.close()'
-                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                         {{ $type }}
                                     </button>
                                 @endforeach
@@ -567,7 +567,7 @@
                                 </div>
                             </div>
                             <button type="button" onclick="applyPriceFilter(); dropdowns.price.close()"
-                                class="w-full bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 rounded-md transition-colors">
+                                class="w-full bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-gray-900 dark:text-gray-900 text-sm font-medium py-2 rounded-md transition-colors">
                                 {{ __('centers.search_filter.apply') }}
                             </button>
                         </div>
@@ -604,7 +604,7 @@
                                         </div>
                                     </div>
                                     <button type="button" onclick="applyPriceFilterMobile(); dropdowns.price.close()"
-                                        class="w-full bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2 rounded-md transition-colors">
+                                        class="w-full bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-gray-900 dark:text-gray-900 text-sm font-medium py-2 rounded-md transition-colors">
                                         {{ __('centers.search_filter.apply') }}
                                     </button>
                                 </div>

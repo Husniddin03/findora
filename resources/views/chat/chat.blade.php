@@ -1,8 +1,7 @@
 <x-layout>
     <x-slot:title>{{ __('chat.title') }}</x-slot:title>
 
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-        <!-- Mobile sidebar overlay -->
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
         <div x-data="{ sidebarOpen: false }" x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
@@ -11,11 +10,13 @@
         </div>
 
         <div class="flex h-screen">
-            <!-- Sidebar -->
-            <aside x-data="{ sidebarOpen: false }" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-                class="fixed inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0">
-
-                <!-- Sidebar Header -->
+            <aside x-data="{ sidebarOpen: false }"
+                :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                class="fixed top-16 bottom-0 left-0 z-40 w-80
+                bg-white dark:bg-gray-800
+                border-r border-gray-200 dark:border-gray-700
+                transition-transform duration-300 ease-in-out
+                lg:translate-x-0 lg:static lg:inset-0">
                 <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center space-x-3">
                         <div
@@ -41,7 +42,6 @@
                     </button>
                 </div>
 
-                <!-- New Chat Button -->
                 <div class="p-4">
                     <button onclick="newChat()"
                         class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
@@ -53,11 +53,10 @@
                     </button>
                 </div>
 
-                <!-- Sessions List -->
                 <div class="flex-1 overflow-y-auto px-4 pb-4">
                     <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
                         {{ __('chat.sidebar.history') }}</h3>
-                    <div class="space-y-2" id="sess-list">
+                    <div class="space-y-2 overflow-y-auto h-[calc(100vh-300px)]" id="sess-list">
                         @forelse($sessions as $s)
                             <div class="group cursor-pointer rounded-lg p-3 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 {{ $currentSession?->id == $s->id ? 'bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700' : 'border border-transparent' }}"
                                 id="si-{{ $s->id }}" onclick="loadSess({{ $s->id }})">
@@ -96,56 +95,10 @@
                 </div>
             </aside>
 
-            <!-- Main Content -->
             <div class="flex-1 flex flex-col">
-                <!-- Header -->
-                <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <!-- Mobile menu button -->
-                            <button @click="sidebarOpen = true"
-                                class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"></path>
-                                </svg>
-                            </button>
 
-                            <div>
-                                <h1 class="text-xl font-bold text-gray-900 dark:text-white" id="tb-title">
-                                    {{ $currentSession?->title ?? __('chat.topbar.title_default') }}
-                                </h1>
-                                <p class="text-sm text-gray-500 dark:text-gray-400" id="tb-sub">
-                                    {{ $currentSession ? __('chat.topbar.subtitle') : '' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-4">
-                            <!-- Theme toggle -->
-                            <button onclick="toggleTheme()"
-                                class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
-                                    </path>
-                                </svg>
-                                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </header>
-
-                <!-- Messages area -->
                 <div class="flex-1 overflow-y-auto px-6 py-6" id="msgs">
                     @if ($messages->isEmpty())
-                        <!-- Empty state -->
                         <div class="flex-1 flex flex-col items-center justify-center text-center py-12"
                             id="empty-state">
                             <div
@@ -162,7 +115,6 @@
                             <p class="text-gray-600 dark:text-gray-400 max-w-md mb-8">
                                 {{ __('chat.empty.description') }}</p>
 
-                            <!-- Suggestion buttons -->
                             <div class="flex flex-wrap gap-2 justify-center max-w-2xl">
                                 <button onclick="fillIn(this.textContent)"
                                     class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
@@ -191,13 +143,11 @@
                             </div>
                         </div>
                     @else
-                        <!-- Messages -->
                         @foreach ($messages as $m)
                             <div
                                 class="flex {{ $m->role === 'user' ? 'justify-end' : 'justify-start' }} mb-4 animate-fade-in">
                                 <div
                                     class="flex items-start space-x-3 max-w-3xl {{ $m->role === 'user' ? 'flex-row-reverse space-x-reverse' : '' }}">
-                                    <!-- Avatar -->
                                     <div
                                         class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center {{ $m->role === 'user' ? 'bg-gradient-to-r from-indigo-500 to-purple-600' : 'bg-gray-200 dark:bg-gray-700' }}">
                                         <span
@@ -206,7 +156,6 @@
                                         </span>
                                     </div>
 
-                                    <!-- Message bubble -->
                                     <div class="flex-1">
                                         <div
                                             class="inline-block max-w-full px-4 py-3 rounded-2xl {{ $m->role === 'user' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-none' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-bl-none' }}">
@@ -229,42 +178,35 @@
                     @endif
                 </div>
 
-                <!-- Input area -->
-                <div class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4">
-                    <div class="flex items-end space-x-4">
-                        <div class="flex-1">
+                <div class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 sticky bottom-0">
+                    <div class="max-w-4xl mx-auto relative">
+                        <div class="relative bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all duration-200 flex flex-col">
                             <textarea id="inp"
-                                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                                class="w-full bg-transparent border-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-0 resize-none py-3 px-4 min-h-[52px]"
                                 placeholder="{{ __('chat.search.placeholder') }}" rows="1"></textarea>
-                            <div class="flex justify-between items-center mt-2">
-                                <span class="text-xs text-gray-500 dark:text-gray-400">
-                                    <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">Enter</kbd>
-                                    {{ __('chat.input.send_btn') }} ·
-                                    <kbd
-                                        class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">Shift+Enter</kbd>
-                                    {{ __('chat.input.keyboard_shortcut') }}
+                            
+                            <div class="flex justify-between items-center px-4 pb-2">
+                                <span class="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-2">
+                                    <span><kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded text-[10px] font-semibold text-gray-500 dark:text-gray-400">Enter</kbd> {{ __('chat.input.send_btn') }}</span>
+                                    <span><kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded text-[10px] font-semibold text-gray-500 dark:text-gray-400">Shift+Enter</kbd> {{ __('chat.input.keyboard_shortcut') }}</span>
                                 </span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400 font-mono"
-                                    id="char-count">0/2000</span>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs text-gray-400 dark:text-gray-500 font-mono" id="char-count">0/2000</span>
+                                    <button id="send-btn" onclick="send()"
+                                        class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <button id="send-btn" onclick="send()"
-                            class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105">
-                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                            </svg>
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    {{-- 
-        chat.blade.php dagi mavjud <script> blokini shu bilan almashtiring.
-        Groq API to'g'ridan-to'g'ri frontenddan chaqiriladi (server proxy yo'q).
-    --}}
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -293,12 +235,16 @@
             });
         @endforeach
 
-        /* ─── Tizim xabari ─────────────────────────────────────────────────── */
+        /* ─── Tizim xabari (YANGILANGAN) ────────────────────────────────────── */
         const SYSTEM_MSG = {
             role: 'system',
-            content: `Sen O'zbekistondagi o'quv markazlar va kurslar haqida ma'lumot beruvchi AI yordamchisisan.
-            Foydalanuvchi o'quv markaz, kurs yoki ta'lim haqida so'rasa, get_learning_centers funksiyasini chaqir. Va get_learning_centers funksiyadan kelgan Har bir markazni o'z slugi yordamida havola hosil qil. APP_URL("/center/" . $center->slug) ].
-            Natijalarni qulay markdown formatida taqdim et. Har doim o'zbek tilida javob ber.`
+            content: `You are an expert AI assistant providing information about learning centers, tutoring, and educational courses in Uzbekistan.
+            
+            GUIDELINES:
+            1. Answer the user's question directly and naturally.
+            2. If the user is asking about learning centers, courses, subjects, or regions, you may optionally call the 'get_learning_centers' function, but it is not required for a basic answer.
+            3. Do NOT embed full center details in your text; the frontend will render them as cards.
+            4. Always respond in the same language the user used.`
         };
 
         /* ─── Function Calling tool ta'rifi ───────────────────────────────── */
@@ -450,8 +396,8 @@
             const r = await api(URL_SEARCH, 'POST', {
                 keywords
             });
-            if (r.ok && r.context) return r.context;
-            return "Hozircha mos o'quv markaz topilmadi.";
+            if (r.ok && r.raw_data && r.raw_data.length > 0) return r;
+            return { context: null, raw_data: [] };
         }
 
         /* ═══════════════════════════════════════════
@@ -472,50 +418,41 @@
 
             const typingEl = appendTyping();
             let fullResp = '';
+            let rawData = [];
 
             try {
-                const messages = [...localHistory, {
-                    role: 'user',
-                    content: msg
-                }];
+                const messages = [...localHistory, { role: 'user', content: msg }];
 
-                // ── 1. Birinchi Groq so'rov (tool_choice: auto) ──────────────────
-                const first = await callGroq(messages, true);
-                const choice = first.choices?.[0];
-                const aiMsg = choice?.message ?? {};
-                const toolCalls = aiMsg.tool_calls ?? [];
+                // Detect if the user is likely searching for learning centers
+                const needsCenter = /markaz|kurs|fan|viloyat|region|o'quv|centers/i.test(msg);
 
-                if (toolCalls.length > 0) {
-                    // ── 2. Tool chaqiruv bor → DB qidirish ───────────────────────
-                    const tc = toolCalls[0];
-                    let args = {};
-                    try {
-                        args = JSON.parse(tc.function.arguments);
-                    } catch {}
+                // Simple province extraction from user message (supports common Uzbek province names)
+                const provinces = ['Andijon','Buxoro','Farg\'ona','Jizzax','Namangan','Navoiy','Qashqadaryo','Samarqand','Sirdaryo','Surxondaryo','Toshkent','Xorazm'];
+                let detectedProvince = '';
+                const lowerMsg = msg.toLowerCase();
+                for (const prov of provinces) {
+                    if (lowerMsg.includes(prov.toLowerCase())) {
+                        detectedProvince = prov;
+                        break;
+                    }
+                }
 
-                    const centerContext = await fetchCenters(args.keywords ?? args);
+                // First request to AI without tool usage – get a natural answer
+                const first = await callGroq(messages, false);
+                const aiMsg = first.choices?.[0]?.message ?? {};
+                fullResp = aiMsg.content ?? '';
+                rawData = [];
 
-                    // ── 3. Tool natijasini qo'shib ikkinchi so'rov ───────────────
-                    const messages2 = [
-                        ...messages,
-                        {
-                            role: 'assistant',
-                            content: null,
-                            tool_calls: toolCalls,
-                        },
-                        {
-                            role: 'tool',
-                            tool_call_id: tc.id,
-                            content: centerContext,
-                        },
-                    ];
-
-                    const second = await callGroq(messages2, false);
-                    fullResp = second.choices?.[0]?.message?.content ?? '';
-
-                } else {
-                    // ── Oddiy javob ───────────────────────────────────────────────
-                    fullResp = aiMsg.content ?? '';
+                // If it looks like a center query, fetch data from backend and render cards
+                if (needsCenter) {
+                    const fetchParams = { query: msg };
+                    if (detectedProvince) fetchParams.province = detectedProvince;
+                    const centerResp = await fetchCenters(fetchParams);
+                    rawData = centerResp.raw_data || [];
+                    // Provide a default intro if AI didn't return anything useful
+                    if (!fullResp.trim()) {
+                        fullResp = "Mana siz izlagan o'quv markazlari:";
+                    }
                 }
 
                 typingEl.remove();
@@ -523,6 +460,10 @@
                 const aiEl = appendMsg('assistant', fullResp);
                 const aiMd = aiEl.querySelector('.prose');
                 if (aiMd) aiMd.innerHTML = marked.parse(fullResp);
+                
+                if (rawData && rawData.length > 0) {
+                    appendCards(rawData, aiEl);
+                }
                 scrollBot();
 
             } catch (err) {
@@ -653,6 +594,45 @@
             return d.innerHTML;
         }
 
+        function appendCards(centers, containerDiv) {
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 w-full';
+            
+            centers.forEach(c => {
+                const url = c.slug ? `/center/${c.slug}` : '#';
+                const type = c.type ? `<span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 rounded text-[10px] font-semibold uppercase tracking-wider">${esc(c.type)}</span>` : '';
+                const region = (c.province && c.region) ? `<div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1.5"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span class="truncate">${esc(c.province)}, ${esc(c.region)}</span></div>` : '';
+                
+                const card = document.createElement('div');
+                card.className = 'flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600 transition-all overflow-hidden group cursor-pointer w-full';
+                card.onclick = () => window.open(url, '_blank');
+                
+                card.innerHTML = `
+                    <div class="p-3 flex-1">
+                        <div class="flex justify-between items-start mb-1 gap-2">
+                            <h4 class="font-bold text-sm text-gray-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" title="${esc(c.name)}">${esc(c.name)}</h4>
+                            ${type}
+                        </div>
+                        ${region}
+                    </div>
+                    <div class="px-3 py-2.5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                        <span class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 group-hover:underline">Batafsil</span>
+                        <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            
+            // contentDiv - appendMsg dagi 'flex-1' container (bubble va timeDiv saqlanuvchi qismi)
+            const contentDiv = containerDiv.querySelector('.flex-1');
+            const timeDiv = contentDiv.querySelector('p.text-xs');
+            if (contentDiv && timeDiv) {
+                contentDiv.insertBefore(grid, timeDiv);
+            } else if (contentDiv) {
+                contentDiv.appendChild(grid);
+            }
+        }
+
         /* ═══════════════════════════════════════════
            SIDEBAR YANGILASH
         ═══════════════════════════════════════════ */
@@ -708,5 +688,4 @@
             inp.focus();
         });
     </script>
-
 </x-layout>

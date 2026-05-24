@@ -119,7 +119,7 @@ class ChatController extends Controller
         // SearchService uchun parametrlarni tayyorlash
         $filters = [
             'searchText' => $kw['query'] ?? '',
-            'per_page' => 8,
+            'per_page' => 5,
         ];
 
         if (!empty($kw['province'])) {
@@ -159,6 +159,7 @@ class ChatController extends Controller
                 'ok' => true,
                 'context' => $context,
                 'count' => $centers->count(),
+                'raw_data' => $centers,
             ]);
 
         } catch (\Exception $e) {
@@ -300,14 +301,16 @@ class ChatController extends Controller
                                 $messages[] = [
                                     'role' => 'assistant',
                                     'content' => null,
-                                    'tool_calls' => [[
-                                        'id' => $toolCall->id,
-                                        'type' => $toolCall->type,
-                                        'function' => [
-                                            'name' => $toolCall->function->name,
-                                            'arguments' => $toolCall->function->arguments,
-                                        ],
-                                    ]],
+                                    'tool_calls' => [
+                                        [
+                                            'id' => $toolCall->id,
+                                            'type' => $toolCall->type,
+                                            'function' => [
+                                                'name' => $toolCall->function->name,
+                                                'arguments' => $toolCall->function->arguments,
+                                            ],
+                                        ]
+                                    ],
                                 ];
                                 $messages[] = [
                                     'role' => 'tool',

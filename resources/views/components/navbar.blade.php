@@ -78,11 +78,11 @@
                             class="absolute right-0 mt-2 w-48 rounded-xl shadow-floating bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 dark:border-gray-700">
                             <div class="py-2">
                                 <a href="{{ route('index') }}#features"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                     {{ __('navbar.features') }}
                                 </a>
                                 <a href="{{ route('index') }}#support"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                     {{ __('navbar.support') }}
                                 </a>
                             </div>
@@ -112,19 +112,19 @@
                             class="absolute right-0 mt-2 w-48 rounded-xl shadow-floating bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 dark:border-gray-700">
                             <div class="py-2">
                                 <a href="{{ route('language.switch', 'uz') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                     {{ __('common.uzbek') }}
                                 </a>
                                 <a href="{{ route('language.switch', 'en') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                     {{ __('common.english') }}
                                 </a>
                                 <a href="{{ route('language.switch', 'ru') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                     {{ __('common.russian') }}
                                 </a>
                                 <a href="{{ route('language.switch', 'kaa') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                     {{ __('common.karakalpak') }}
                                 </a>
                             </div>
@@ -186,13 +186,13 @@
                             class="absolute right-0 mt-2 w-48 rounded-xl shadow-floating bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 dark:border-gray-700">
                             <div class="py-2">
                                 <a href="{{ route('profile') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                     {{ __('navbar.profile') }}
                                 </a>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
                                     <button type="submit"
-                                        class="block cursor-pointer w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:border-1 hover:rounded-md transition-colors duration-200">
+                                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-transparent rounded-md hover:border-gray-400">
                                         {{ __('navbar.logout') }}
                                     </button>
                                 </form>

@@ -414,7 +414,7 @@
                                     @endif
 
                                     {{-- Rating Badge --}}
-                                    <div class="absolute top-3 right-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-gray-200 dark:border-gray-600">
+                                    <div class="absolute top-3 right-3 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-gray-200 dark:border-gray-600">
                                         @php $average = $center->rating; @endphp
                                         <div class="flex items-center space-x-1">
                                             <span class="text-amber-500 text-sm">★</span>
@@ -667,7 +667,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <div class="max-w-3xl mx-auto">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
-                    <span class="text-amber-300 font-bold">{{ $centers->count() ?? 0 }}</span>
+                    <span class="text-amber-300 font-bold">{{ $all_centers_count }}</span>
                     <span class="text-white/90">{{ __('index.cta.count_suffix') }}</span>
                 </div>
                 <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">

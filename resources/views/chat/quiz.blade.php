@@ -8,32 +8,47 @@
 <style>
     /* Enhanced AI response box styles */
     .ai-response-box {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
-        border: 1px solid rgba(71, 85, 105, 0.5);
+        background: linear-gradient(135deg, rgba(241, 245, 249, 0.8), rgba(226, 232, 240, 0.8));
+        border: 1px solid rgba(203, 213, 225, 0.5);
         border-radius: 12px;
         padding: 1.5rem;
-        color: #e2e8f0;
+        color: #1e293b;
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(71, 85, 105, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(203, 213, 225, 0.1);
         backdrop-filter: blur(8px);
         min-height: 120px;
     }
+    .dark .ai-response-box {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        color: #e2e8f0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(71, 85, 105, 0.1);
+    }
     .ai-response-box h2 {
         font-size: 1.25rem;
-        color: #60a5fa;
+        color: #2563eb;
         margin-bottom: 0.75rem;
         font-weight: 600;
     }
+    .dark .ai-response-box h2 {
+        color: #60a5fa;
+    }
     .ai-response-box h3 {
         font-size: 1.1rem;
-        color: #a78bfa;
+        color: #7c3aed;
         margin: 1rem 0 0.5rem 0;
         font-weight: 600;
+    }
+    .dark .ai-response-box h3 {
+        color: #a78bfa;
     }
     .ai-response-box p {
         font-size: 0.95rem;
         line-height: 1.6;
         margin-bottom: 0.75rem;
+        color: #334155;
+    }
+    .dark .ai-response-box p {
         color: #cbd5e1;
     }
     .ai-response-box ul {
@@ -43,27 +58,41 @@
         font-size: 0.9rem;
         line-height: 1.5;
         margin-bottom: 0.4rem;
+        color: #334155;
+    }
+    .dark .ai-response-box li {
         color: #cbd5e1;
     }
     .ai-response-box strong {
-        color: #e2e8f0;
+        color: #0f172a;
         font-weight: 600;
     }
+    .dark .ai-response-box strong {
+        color: #e2e8f0;
+    }
     .ai-response-box code {
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(0, 0, 0, 0.05);
         padding: 0.2rem 0.4rem;
         border-radius: 4px;
         font-size: 0.85rem;
+        color: #7c3aed;
+    }
+    .dark .ai-response-box code {
+        background: rgba(0, 0, 0, 0.3);
         color: #a78bfa;
     }
 
     /* Enhanced chart styles */
     canvas#resultChart {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.6));
+        background: linear-gradient(135deg, rgba(241, 245, 249, 0.9), rgba(226, 232, 240, 0.9));
         border-radius: 12px;
         padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(71, 85, 105, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(148, 163, 184, 0.1);
         backdrop-filter: blur(8px);
+    }
+    .dark canvas#resultChart {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.6));
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(71, 85, 105, 0.1);
     }
 
     /* Score bars animation */
@@ -83,7 +112,7 @@
     }
 </style>
 
-<div class="font-sans bg-slate-950 min-h-screen p-4 md:p-8 relative overflow-x-hidden dark-mode" id="quiz-container">
+<div class="font-sans bg-gray-50 dark:bg-gray-900 min-h-screen p-4 md:p-8 relative overflow-x-hidden" id="quiz-container">
     <!-- Orbs -->
     <div class="fixed w-[500px] h-[500px] rounded-full pointer-events-none z-0 blur-[80px] opacity-35 bg-gradient-to-r from-blue-600 to-transparent -top-48 -left-24"></div>
     <div class="fixed w-[400px] h-[400px] rounded-full pointer-events-none z-0 blur-[80px] opacity-35 bg-gradient-to-r from-purple-600 to-transparent -bottom-24 -right-20"></div>
@@ -97,73 +126,73 @@
                     {{ __('quiz.hero.badge') }}
                 </div>
             </a>
-            <h1 class="text-3xl md:text-5xl font-black text-slate-100 leading-tight mb-3">
+            <h1 class="text-3xl md:text-5xl font-black text-gray-900 dark:text-gray-100 leading-tight mb-3">
                 {{ __('quiz.hero.title') }}
             </h1>
-            <p class="text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
+            <p class="text-sm text-gray-600 dark:text-gray-400 max-w-lg mx-auto leading-relaxed">
                 {{ __('quiz.hero.description') }}
             </p>
         </div>
 
         <!-- Legend -->
         <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-            <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.05s">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.05s">
                 <div class="w-2.5 h-2.5 bg-red-400 rounded-full flex-shrink-0"></div>
                 <div>
-                    <strong class="block text-slate-100 text-[11px]">{{ __('quiz.legend.realistic') }}</strong>
-                    <span class="text-slate-400">{{ __('quiz.legend.realistic_desc') }}</span>
+                    <strong class="block text-gray-900 dark:text-gray-100 text-[11px]">{{ __('quiz.legend.realistic') }}</strong>
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('quiz.legend.realistic_desc') }}</span>
                 </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.1s">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.1s">
                 <div class="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0"></div>
                 <div>
-                    <strong class="block text-slate-100 text-[11px]">{{ __('quiz.legend.investigative') }}</strong>
-                    <span class="text-slate-400">{{ __('quiz.legend.investigative_desc') }}</span>
+                    <strong class="block text-gray-900 dark:text-gray-100 text-[11px]">{{ __('quiz.legend.investigative') }}</strong>
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('quiz.legend.investigative_desc') }}</span>
                 </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.15s">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.15s">
                 <div class="w-2.5 h-2.5 bg-purple-400 rounded-full flex-shrink-0"></div>
                 <div>
-                    <strong class="block text-slate-100 text-[11px]">{{ __('quiz.legend.artistic') }}</strong>
-                    <span class="text-slate-400">{{ __('quiz.legend.artistic_desc') }}</span>
+                    <strong class="block text-gray-900 dark:text-gray-100 text-[11px]">{{ __('quiz.legend.artistic') }}</strong>
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('quiz.legend.artistic_desc') }}</span>
                 </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.2s">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.2s">
                 <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full flex-shrink-0"></div>
                 <div>
-                    <strong class="block text-slate-100 text-[11px]">{{ __('quiz.legend.social') }}</strong>
-                    <span class="text-slate-400">{{ __('quiz.legend.social_desc') }}</span>
+                    <strong class="block text-gray-900 dark:text-gray-100 text-[11px]">{{ __('quiz.legend.social') }}</strong>
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('quiz.legend.social_desc') }}</span>
                 </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.25s">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.25s">
                 <div class="w-2.5 h-2.5 bg-amber-400 rounded-full flex-shrink-0"></div>
                 <div>
-                    <strong class="block text-slate-100 text-[11px]">{{ __('quiz.legend.enterprising') }}</strong>
-                    <span class="text-slate-400">{{ __('quiz.legend.enterprising_desc') }}</span>
+                    <strong class="block text-gray-900 dark:text-gray-100 text-[11px]">{{ __('quiz.legend.enterprising') }}</strong>
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('quiz.legend.enterprising_desc') }}</span>
                 </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.3s">
-                <div class="w-2.5 h-2.5 bg-slate-400 rounded-full flex-shrink-0"></div>
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-2 text-xs animate-fade-in" style="animation-delay:.3s">
+                <div class="w-2.5 h-2.5 bg-gray-400 rounded-full flex-shrink-0"></div>
                 <div>
-                    <strong class="block text-slate-100 text-[11px]">{{ __('quiz.legend.conventional') }}</strong>
-                    <span class="text-slate-400">{{ __('quiz.legend.conventional_desc') }}</span>
+                    <strong class="block text-gray-900 dark:text-gray-100 text-[11px]">{{ __('quiz.legend.conventional') }}</strong>
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('quiz.legend.conventional_desc') }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Questions -->
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden animate-fade-in">
-            <div class="p-5 flex items-center justify-between border-b border-slate-700 bg-slate-800/50">
-                <h2 class="text-sm font-bold text-slate-100">{{ __('quiz.questions.title') }}</h2>
-                <span class="text-xs text-slate-500 font-mono" id="progress-label">{{ __('quiz.questions.progress') }}</span>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden animate-fade-in shadow-sm">
+            <div class="p-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ __('quiz.questions.title') }}</h2>
+                <span class="text-xs text-gray-500 font-mono" id="progress-label">{{ __('quiz.questions.progress') }}</span>
             </div>
-            <div class="h-1 bg-slate-700">
+            <div class="h-1 bg-gray-100 dark:bg-gray-700">
                 <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-400" id="progress-fill" style="width: 0%"></div>
             </div>
 
             <div class="p-5 flex flex-col gap-2" id="questions-list"></div>
 
-            <div class="p-5 border-t border-slate-700">
+            <div class="p-5 border-t border-gray-200 dark:border-gray-700">
                 <button class="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl text-white font-bold text-base cursor-pointer transition-all duration-250 shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onclick="submitTest()" id="submit-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     {{ __('quiz.submit') }}
@@ -172,14 +201,14 @@
         </div>
 
         <!-- Result -->
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden hidden animate-fade-in" id="result-card">
-            <div class="p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-b border-slate-700 text-center">
-                <h2 class="text-xl font-black text-slate-100 mb-1">{{ __('quiz.result.title') }}</h2>
-                <p class="text-sm text-slate-400">{{ __('quiz.result.subtitle') }}</p>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden hidden animate-fade-in shadow-sm" id="result-card">
+            <div class="p-6 bg-gradient-to-r from-blue-500/5 to-purple-500/5 dark:from-blue-500/10 dark:to-purple-500/10 border-b border-gray-200 dark:border-gray-700 text-center">
+                <h2 class="text-xl font-black text-gray-900 dark:text-gray-100 mb-1">{{ __('quiz.result.title') }}</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('quiz.result.subtitle') }}</p>
             </div>
 
             <!-- Score bars -->
-            <div class="flex flex-col gap-3 p-0" id="score-bars"></div>
+            <div class="flex flex-col gap-3 p-6 pb-0" id="score-bars"></div>
 
             <!-- Chart -->
             <div class="p-6 pt-5">
@@ -187,8 +216,8 @@
             </div>
 
             <!-- AI Tavsiya -->
-            <div class="p-6 border-t border-slate-700">
-                <div class="flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-slate-500 mb-4">
+            <div class="p-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-gray-500 dark:text-gray-400 mb-4">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 16v-4M12 8h.01"/>
@@ -204,13 +233,13 @@
                 </div>
             </div>
 
-            <button class="mx-6 mb-6 w-[calc(100%-3rem)] py-3 border border-slate-700 rounded-lg bg-transparent text-slate-400 font-sans text-sm cursor-pointer transition-all duration-200 hover:border-blue-500 hover:text-blue-500" onclick="resetTest()">↺ {{ __('quiz.reset') }}</button>
+            <button class="mx-6 mb-6 w-[calc(100%-3rem)] py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent text-gray-600 dark:text-gray-400 font-sans text-sm cursor-pointer transition-all duration-200 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-500" onclick="resetTest()">↺ {{ __('quiz.reset') }}</button>
         </div>
 
         <!-- History table -->
         @if($history->count())
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden animate-fade-in overflow-x-auto">
-            <div class="p-4 border-b border-slate-700 flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-slate-500">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden animate-fade-in overflow-x-auto shadow-sm">
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-gray-500 dark:text-gray-400">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
                     <path d="M12 6v6l4 2"/>
@@ -221,10 +250,10 @@
             <table class="w-full border-collapse text-sm">
                 <thead>
                     <tr>
-                        <th class="p-3 text-left font-semibold text-slate-500 text-[10px] tracking-wide uppercase bg-slate-800/50 border-b border-slate-700">#</th>
-                        <th class="p-3 text-left font-semibold text-slate-500 text-[10px] tracking-wide uppercase bg-slate-800/50 border-b border-slate-700">{{ __('quiz.history.headers.results') }}</th>
-                        <th class="p-3 text-left font-semibold text-slate-500 text-[10px] tracking-wide uppercase bg-slate-800/50 border-b border-slate-700">{{ __('quiz.history.headers.best_type') }}</th>
-                        <th class="p-3 text-left font-semibold text-slate-500 text-[10px] tracking-wide uppercase bg-slate-800/50 border-b border-slate-700">{{ __('quiz.history.headers.date') }}</th>
+                        <th class="p-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-[10px] tracking-wide uppercase bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">#</th>
+                        <th class="p-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-[10px] tracking-wide uppercase bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">{{ __('quiz.history.headers.results') }}</th>
+                        <th class="p-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-[10px] tracking-wide uppercase bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">{{ __('quiz.history.headers.best_type') }}</th>
+                        <th class="p-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-[10px] tracking-wide uppercase bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">{{ __('quiz.history.headers.date') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -235,8 +264,8 @@
                         $top = array_key_first($scores);
                         $colors = ['R'=>'#f87171','I'=>'#5b8fff','A'=>'#c084fc','S'=>'#34d399','E'=>'#fbbf24','C'=>'#94a3b8'];
                     @endphp
-                    <tr>
-                        <td class="p-3 text-slate-500 text-[10px] font-mono">{{ $i+1 }}</td>
+                    <tr class="border-b border-gray-100 dark:border-gray-700/50 last:border-0">
+                        <td class="p-3 text-gray-500 dark:text-gray-400 text-[10px] font-mono">{{ $i+1 }}</td>
                         <td class="p-3">
                             <div class="flex gap-1">
                                 @foreach(['R','I','A','S','E','C'] as $k)
@@ -251,7 +280,7 @@
                                 {{ $top }} — {{ $scores[$top] }}%
                             </span>
                         </td>
-                        <td class="p-3 text-[11px] text-slate-500 whitespace-nowrap">
+                        <td class="p-3 text-[11px] text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             {{ $r->created_at->format('d.m.Y H:i') }}
                         </td>
                     </tr>
@@ -308,18 +337,13 @@ const typeDesc   = { R:'Amaliy, texnika', I:'Tadqiqot, fan', A:'San\'at, ijod', 
 
 let answeredCount = 0;
 let chart = null;
-
-// Initialize theme on load
-window.addEventListener('load', () => {
-    initTheme();
-    addThemeToggle();
-});
+let lastScores = null;
 
 // Build questions
 const list = document.getElementById('questions-list');
 questions.forEach((q, i) => {
     const div = document.createElement('div');
-    div.className = 'question-item flex items-center justify-between gap-4 p-4 rounded-lg bg-slate-900 border border-slate-700 transition-all duration-200';
+    div.className = 'question-item flex items-center justify-between gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 transition-all duration-200';
     div.id = `q-item-${i}`;
 
     // Detect type
@@ -327,14 +351,14 @@ questions.forEach((q, i) => {
     const dot = `<span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block mr-1 flex-shrink-0" style="background:${typeColors[type]}"></span>`;
 
     div.innerHTML = `
-        <span class="question-num text-[10px] font-bold text-slate-500 mr-0.5 font-mono flex-shrink-0">${String(i+1).padStart(2,'0')}</span>
+        <span class="question-num text-[10px] font-bold text-gray-500 mr-0.5 font-mono flex-shrink-0">${String(i+1).padStart(2,'0')}</span>
         ${dot}
-        <span class="question-text text-sm text-slate-400 leading-relaxed flex-1">${q}</span>
+        <span class="question-text text-sm text-gray-700 dark:text-gray-400 leading-relaxed flex-1">${q}</span>
         <div class="radio-group flex gap-1 flex-shrink-0 md:flex-row flex-col">
-            <label class="radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-slate-600 bg-slate-800 cursor-pointer text-xs text-slate-500 transition-all duration-180 hover:border-blue-500 hover:text-blue-500" id="pill-yes-${i}" onclick="pickAnswer(${i},1)">
+            <label class="radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer text-xs text-gray-500 dark:text-gray-400 transition-all duration-180 hover:border-blue-500 hover:text-blue-500" id="pill-yes-${i}" onclick="pickAnswer(${i},1)">
                 <input type="radio" name="q${i}" value="1" class="hidden">✓ {{ __('quiz.buttons.yes') }}
             </label>
-            <label class="radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-slate-600 bg-slate-800 cursor-pointer text-xs text-slate-500 transition-all duration-180 hover:border-blue-500 hover:text-blue-500" id="pill-no-${i}" onclick="pickAnswer(${i},0)">
+            <label class="radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer text-xs text-gray-500 dark:text-gray-400 transition-all duration-180 hover:border-blue-500 hover:text-blue-500" id="pill-no-${i}" onclick="pickAnswer(${i},0)">
                 <input type="radio" name="q${i}" value="0" class="hidden">✗ {{ __('quiz.buttons.no') }}
             </label>
         </div>`;
@@ -351,14 +375,15 @@ function pickAnswer(i, val) {
     const yesP = document.getElementById(`pill-yes-${i}`);
     const noP  = document.getElementById(`pill-no-${i}`);
     yesP.className = val === 1 
-        ? 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-emerald-500 bg-emerald-500/10 cursor-pointer text-xs text-emerald-500 transition-all duration-180' 
-        : 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-slate-600 bg-slate-800 cursor-pointer text-xs text-slate-500 transition-all duration-180 hover:border-blue-500 hover:text-blue-500';
+        ? 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 cursor-pointer text-xs text-emerald-600 dark:text-emerald-500 transition-all duration-180' 
+        : 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer text-xs text-gray-500 dark:text-gray-400 transition-all duration-180 hover:border-blue-500 hover:text-blue-500';
     noP.className  = val === 0 
-        ? 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-slate-500 bg-slate-700/30 cursor-pointer text-xs text-slate-500 transition-all duration-180' 
-        : 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-slate-600 bg-slate-800 cursor-pointer text-xs text-slate-500 transition-all duration-180 hover:border-blue-500 hover:text-blue-500';
+        ? 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-rose-500 bg-rose-50 dark:bg-rose-500/10 cursor-pointer text-xs text-rose-600 dark:text-rose-450 transition-all duration-180' 
+        : 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer text-xs text-gray-500 dark:text-gray-400 transition-all duration-180 hover:border-blue-500 hover:text-blue-500';
 
-    document.getElementById(`q-item-${i}`).classList.add('border-blue-500/30', 'bg-blue-500/4');
-    document.getElementById(`q-item-${i}`).classList.remove('border-slate-700', 'bg-slate-900');
+    const item = document.getElementById(`q-item-${i}`);
+    item.classList.add('border-blue-500/30', 'bg-blue-500/5', 'dark:bg-blue-500/10');
+    item.classList.remove('border-gray-200', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
 
     if (!wasAnswered) {
         answeredCount++;
@@ -378,11 +403,11 @@ function submitTest() {
             if (!document.querySelector(`input[name="q${i}"]:checked`)) {
                 document.getElementById(`q-item-${i}`).scrollIntoView({ behavior:'smooth', block:'center' });
                 const item = document.getElementById(`q-item-${i}`);
-                item.classList.remove('border-slate-700', 'bg-slate-900');
+                item.classList.remove('border-gray-200', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
                 item.classList.add('border-red-400', 'bg-red-400/10');
                 setTimeout(() => {
                     item.classList.remove('border-red-400', 'bg-red-400/10');
-                    item.classList.add('border-slate-700', 'bg-slate-900');
+                    item.classList.add('border-gray-200', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
                 }, 1500);
                 break;
             }
@@ -432,6 +457,7 @@ async function saveResult(scores) {
 }
 
 function showResult(scores) {
+    lastScores = scores;
     const card = document.getElementById('result-card');
     card.classList.remove('hidden');
     card.classList.add('block');
@@ -447,10 +473,10 @@ function showResult(scores) {
         row.className = 'score-row flex items-center gap-3';
         row.style.animationDelay = `${delay}ms`;
         row.innerHTML = `
-            <div class="score-label w-32 flex-shrink-0 text-xs text-slate-400">
-                <strong class="text-slate-100">${t}</strong> ${typeDesc[t]}
+            <div class="score-label w-32 flex-shrink-0 text-xs text-gray-500 dark:text-gray-400">
+                <strong class="text-gray-900 dark:text-gray-100">${t}</strong> ${typeDesc[t]}
             </div>
-            <div class="score-track flex-1 h-2.5 bg-slate-900 rounded-full overflow-hidden">
+            <div class="score-track flex-1 h-2.5 bg-gray-100 dark:bg-gray-900 rounded-full overflow-hidden">
                 <div class="score-fill h-full rounded-full transition-all duration-1000 ease-out" id="fill-${t}" style="background:${typeColors[t]};width:0%"></div>
             </div>
             <div class="score-pct w-9 text-right text-xs font-bold font-mono" style="color:${typeColors[t]}">${pct}%</div>`;
@@ -461,6 +487,7 @@ function showResult(scores) {
 
     // Chart
     if (chart) chart.destroy();
+    const isDark = document.documentElement.classList.contains('dark');
     chart = new Chart(document.getElementById('resultChart'), {
         type: 'bar',
         data: {
@@ -485,10 +512,10 @@ function showResult(scores) {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    titleColor: '#e2e8f0',
-                    bodyColor: '#cbd5e1',
-                    borderColor: 'rgba(71, 85, 105, 0.5)',
+                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)',
+                    titleColor: isDark ? '#e2e8f0' : '#0f172a',
+                    bodyColor: isDark ? '#cbd5e1' : '#334155',
+                    borderColor: isDark ? 'rgba(71, 85, 105, 0.5)' : 'rgba(203, 213, 225, 0.8)',
                     borderWidth: 1,
                     padding: 12,
                     displayColors: true,
@@ -503,17 +530,17 @@ function showResult(scores) {
                     max: 100,
                     ticks: {
                         callback: v => v+'%',
-                        color: '#94a3b8',
+                        color: isDark ? '#94a3b8' : '#64748b',
                         font: { size: 11, family: 'Inter, system-ui' }
                     },
                     grid: {
-                        color: 'rgba(71, 85, 105, 0.2)',
+                        color: isDark ? 'rgba(71, 85, 105, 0.2)' : 'rgba(148, 163, 184, 0.2)',
                         drawBorder: false
                     }
                 },
                 x: {
                     ticks: {
-                        color: '#cbd5e1',
+                        color: isDark ? '#cbd5e1' : '#334155',
                         font: { size: 11, family: 'Inter, system-ui' }
                     },
                     grid: { display: false }
@@ -597,14 +624,22 @@ Javob formati (faqat O'zbek tilida):
     }
 }
 
+// Observe HTML class changes to dynamically update chart colors on theme toggle
+const observer = new MutationObserver(() => {
+    if (chart && lastScores) {
+        showResult(lastScores);
+    }
+});
+observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
 function resetTest() {
     document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
     document.querySelectorAll('.radio-pill').forEach(p => {
-        p.className = 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-slate-600 bg-slate-800 cursor-pointer text-xs text-slate-500 transition-all duration-180 hover:border-blue-500 hover:text-blue-500';
+        p.className = 'radio-pill flex items-center gap-1 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer text-xs text-gray-500 dark:text-gray-400 transition-all duration-180 hover:border-blue-500 hover:text-blue-500';
     });
     document.querySelectorAll('.question-item').forEach(i => {
-        i.classList.remove('border-blue-500/30', 'bg-blue-500/4');
-        i.classList.add('border-slate-700', 'bg-slate-900');
+        i.classList.remove('border-blue-500/30', 'bg-blue-500/5', 'dark:bg-blue-500/10');
+        i.classList.add('border-gray-200', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
     });
     answeredCount = 0;
     updateProgress();

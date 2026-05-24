@@ -98,7 +98,7 @@
                 RIASEC testi qanday ishlaydi?
             </h2>
             <p class="text-gray-600 leading-relaxed text-lg">
-                {{ __('riasec.test.how_it_works') }}da 20–60 ta "Ha/Yo'q" savollaridan iborat bo'ladi.
+                RIASECda 20–60 ta "Ha/Yo'q" savollaridan iborat bo'ladi.
                 {{ __('riasec.test.description') }}
             </p>
         </section>

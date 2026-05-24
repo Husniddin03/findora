@@ -12,7 +12,8 @@ return [
 
     // Buttons
     'home_button' => 'Asosıy sahifa',
-
+    'back_button' => 'Ortga qaytish',
+    
     // Help Section
     'help' => [
         'problem_continues' => 'Agar muammo davom etsa, iltimos, biz bilen bog\'laning:',

@@ -1,71 +1,90 @@
 <x-layout>
     <x-slot:title>{{ __('404.title') }}</x-slot:title>
 
-    <div
-        class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-accent-600 to-primary-800 relative overflow-hidden">
-        <!-- Background Shapes -->
-        <div class="absolute inset-0">
-            <div class="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-20 right-20 w-96 h-96 bg-accent-400/20 rounded-full blur-3xl"></div>
-            <div class="absolute top-1/2 left-1/3 w-64 h-64 bg-white/5 rounded-full blur-2xl"></div>
-        </div>
+    <div class="relative min-h-screen">
+    
+        {{-- Content (z-10 bilan gradientlardan yuqoriga chiqarildi) --}}
+        <div class="relative z-10 flex items-center justify-center min-h-screen px-6 py-16">
+            <div class="max-w-3xl mx-auto text-center">
 
-        <!-- 404 Content -->
-        <div class="relative z-10 text-center px-6 max-w-2xl mx-auto">
-            <div class="animate-fade-in">
-                <!-- 404 Number -->
-                <div class="text-9xl md:text-[12rem] font-bold text-white/20 mb-8">
-                    {{ __('404.error_title') }}
+                {{-- 404 Katta matni --}}
+                <div class="text-[110px] sm:text-[150px] md:text-[200px] font-black leading-none tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 select-none drop-shadow-sm">
+                    404
                 </div>
 
-                <!-- Error Illustration -->
-                <div class="mb-8">
-                    <div
-                        class="inline-flex items-center justify-center w-32 h-32 bg-white/10 rounded-3xl backdrop-blur-xl border border-white/20">
-                        <svg class="w-16 h-16 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                {{-- Icon --}}
+                <div class="flex justify-center -mt-2 mb-8">
+                    <div class="w-24 h-24 rounded-2xl border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-white/5 backdrop-blur-xl shadow-lg flex items-center justify-center transition-colors duration-300">
+                        <svg class="w-12 h-12 text-indigo-600 dark:text-indigo-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                 </div>
 
-                <!-- Error Message -->
-                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                {{-- Title (Kunduzgi rejimda ko'rinishi majburiy qilindi) --}}
+                <h1 class="force-light-text-gray-900 text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5 tracking-tight transition-colors duration-300">
                     {{ __('404.error_message') }}
                 </h1>
-                <p class="text-xl text-white/80 mb-8 max-w-lg mx-auto leading-relaxed">
+
+                {{-- Description --}}
+                <p class="force-light-text-gray-600 max-w-2xl mx-auto text-base sm:text-lg leading-8 text-gray-600 dark:text-gray-300 mb-10 transition-colors duration-300">
                     {{ __('404.error_description') }}
                     {{ __('404.error_action') }}
                 </p>
 
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <x-button variant="secondary" size="lg" href="{{ route('index') }}"
-                        class="bg-white text-primary-600 hover:bg-gray-50">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {{-- Actions --}}
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    {{-- Home --}}
+                    <a href="{{ route('index') }}"
+                        class="group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-7 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md shadow-indigo-500/25 hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-0.5"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
-                        {{ __('404.home_button') }}ga qaytish
-                    </x-button>
+                        <span>{{ __('404.home_button') }}</span>
+                    </a>
 
-                    <x-button variant="outline" size="lg" href="#"
-                        class="border-white text-white hover:bg-white hover:text-primary-600">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {{-- Back --}}
+                    <button onclick="history.back()"
+                        class="group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-7 py-4 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/70 backdrop-blur-xl text-gray-100 dark:text-gray-200 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-sm">
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-0.5"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                d="M15 19l-7-7 7-7" />
                         </svg>
-                        {{ __('404.help.contact_us') }}
-                    </x-button>
+                        <span>{{ __('404.back_button') }}</span>
+                    </button>
                 </div>
 
-                <!-- Help Text -->
-                <div class="mt-12 text-white/60 text-sm">
-                    {{ __('404.help.problem_continues') }}
-                    <a href="tel:+9987702502677" class="text-white/80 hover:text-white transition-colors">
+                {{-- Divider --}}
+                <div class="flex items-center justify-center gap-4 my-12">
+                    <div class="w-20 h-px bg-gray-300 dark:bg-gray-700 transition-colors duration-300"></div>
+                    <div class="w-2 h-2 rounded-full bg-indigo-500 shadow-lg shadow-indigo-500/50"></div>
+                    <div class="w-20 h-px bg-gray-300 dark:bg-gray-700 transition-colors duration-300"></div>
+                </div>
+
+                {{-- Help --}}
+                <div class="inline-flex flex-col sm:flex-row items-center gap-2 px-5 py-4 rounded-2xl bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-sm transition-colors duration-300">
+                    <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300 transition-colors duration-300">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 5.636l-1.414 1.414M15 11a3 3 0 11-6 0 3 3 0 016 0zm6 1a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-sm sm:text-base">
+                            {{ __('404.help.problem_continues') }}
+                        </span>
+                    </div>
+
+                    <a href="tel:+998770250267"
+                        class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors duration-300">
                         (+998) 77 025 02 67
                     </a>
                 </div>
+
             </div>
         </div>
     </div>

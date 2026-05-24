@@ -12,6 +12,7 @@ return [
 
     // Buttons
     'home_button' => 'Asosiy sahifa',
+    'back_button' => 'Ortga qaytish',
 
     // Help Section
     'help' => [

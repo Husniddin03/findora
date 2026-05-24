@@ -12,7 +12,7 @@ return [
 
     // Buttons
     'home_button' => 'Main Page',
-
+    'back_button' => 'Back',
     // Help Section
     'help' => [
         'problem_continues' => 'If the problem continues, please contact us:',

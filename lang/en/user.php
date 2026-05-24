@@ -20,6 +20,7 @@ return [
         'no_centers_title' => 'No centers yet',
         'no_centers_description' => 'Add your learning center and serve thousands of students',
         'add_first_center' => 'Add First Center',
+        'manage_courses' => 'Manage',
     ],
 
     // Dashboard

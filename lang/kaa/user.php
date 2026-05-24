@@ -20,6 +20,7 @@ return [
         'no_centers_title' => 'Alim merkezler joq',
         'no_centers_description' => 'O\'ziwning o\'qiw merkeziwiwdi qosiw hám min\'lap o\'qiwshilar xizmet korsatiw',
         'add_first_center' => 'Birinshi merkezi qosiw',
+        'manage_courses' => 'Bassqariw'
     ],
 
     // Dashboard

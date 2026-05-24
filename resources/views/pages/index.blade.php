@@ -32,7 +32,7 @@
                 <span class="bg-gradient-to-r from-amber-300 via-orange-300 to-amber-400 bg-clip-text text-transparent">
                     Findora
                 </span>
-                {{ __('index.hero.welcome') }}
+                {{ __('index.hero.welcome') }} 
             </h1>
 
             {{-- Description --}}

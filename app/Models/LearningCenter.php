@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Manage\Course;
+use App\Models\Manage\Group;
+use App\Models\Manage\Student;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LearningCenter extends Model
 {
@@ -59,6 +63,21 @@ class LearningCenter extends Model
         return $this->belongsTo(User::class, 'users_id');
     }
 
+    public function courses(): HasMany
+    {
+        return $this->hasMany(Course::class);
+    }
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class);
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
     public function images()
     {
         return $this->hasMany(LearningCentersImage::class, 'learning_centers_id');
@@ -93,6 +112,11 @@ class LearningCenter extends Model
     {
         return $this->hasMany(Favorite::class, 'learning_centers_id');
     }
+    
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 
     // Markaz saqlanayotganda avtomatik slug yasash uchun
     public static function boot()
@@ -126,11 +150,6 @@ class LearningCenter extends Model
         return $slug;
     }
 
-    // Laravel-ga ID o'rniga slug orqali qidirishni aytamiz
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
 
     // Dynamic attribute for average user rating
     public function getUserAverageRatingAttribute()

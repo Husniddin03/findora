@@ -20,6 +20,7 @@ return [
         'no_centers_title' => 'Центров пока нет',
         'no_centers_description' => 'Добавьте свой учебный центр и обслуживайте тысячи студентов',
         'add_first_center' => 'Добавить первый центр',
+        'manage_courses' => 'Управление'
     ],
 
     // Dashboard

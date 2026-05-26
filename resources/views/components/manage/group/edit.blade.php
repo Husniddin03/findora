@@ -25,12 +25,16 @@
                 <input type="text" name="name" x-model="selectedGroup.name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Ustoz ismi</label>
-                <input type="text" name="teacher_name" x-model="selectedGroup.teacher_name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
+                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Ustoz (O'qituvchi)</label>
+                <select name="staff_id" x-model="selectedGroup.staff_id" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
+                    @foreach($teachers as $teacher)
+                        <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Kunlar</label>
                 <select name="days_type" x-model="selectedGroup.days_type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
@@ -42,10 +46,6 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Boshlanish vaqti</label>
                 <input type="text" name="start_time" x-model="selectedGroup.start_time" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Xona</label>
-                <input type="text" name="room" x-model="selectedGroup.room" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
             </div>
         </div>
 

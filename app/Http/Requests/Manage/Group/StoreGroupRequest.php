@@ -9,17 +9,15 @@ class StoreGroupRequest extends FormRequest
     {
         return true;
     }
-
     public function rules(): array
     {
         return [
             'course_id' => 'required|exists:courses,id',
+            'staff_id' => 'required|exists:staff,id', // O'qituvchi ID tekshiruvi
             'name' => 'required|string|max:255',
-            'teacher_name' => 'required|string|max:255',
-            'days_type' => 'required|in:odd,even,custom', // toq, juft, boshqa
-            'start_time' => 'required|string',
-            'room' => 'required|string|max:50',
-            'max_students' => 'required|integer|min:5|max:50',
+            'days_type' => 'required|in:odd,even,custom',
+            'start_time' => 'required',
+            'max_students' => 'required|integer|min:1',
             'status' => 'required|in:collecting,active,finished',
         ];
     }

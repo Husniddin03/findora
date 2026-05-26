@@ -11,10 +11,12 @@ class Create extends Component
 {
     public LearningCenter $center;
     public $courses;
-    public function __construct(LearningCenter $center, $courses)
+    public $teachers;
+    public function __construct(LearningCenter $center, $courses, $teachers)
     {
         $this->center = $center;
         $this->courses = $courses;
+        $this->teachers = $teachers;
     }
     public function render(): View|Closure|string
     {

@@ -20,7 +20,7 @@ return [
         'no_centers_title' => 'Hali markazlar yo\'q',
         'no_centers_description' => 'O\'zingizning o\'quv markazingizni qo\'shing va minglab o\'quvchilarga xizmat ko\'rsating',
         'add_first_center' => 'Birinchi markazni qo\'shish',
-        'manage_courses' => 'Kurslarni'
+        'manage_courses' => 'Boshqaruv'
     ],
 
     // Dashboard

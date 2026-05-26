@@ -22,28 +22,29 @@
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">O'qituvchi (Ustoz)</label>
-                <input type="text" name="teacher_name" placeholder="Ustoz ismi" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
+                <select name="staff_id" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
+                    <option value="">O'qituvchini tanlang</option>
+                    @foreach($teachers as $teacher)
+                        <option value="{{ $teacher->id }}">{{ $teacher->name }} ({{ $teacher->specialty }})</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Kunlar</label>
                 <select name="days_type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
-                    <option value="odd">Toq kunlari</option>
-                    <option value="even">Juft kunlari</option>
+                    <option value="odd">Toq kunlari (Dsh-Chsh-Jm)</option>
+                    <option value="even">Juft kunlari (Ssh-Ph-Sh)</option>
                     <option value="custom">Boshqa</option>
                 </select>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Boshlanish vaqti</label>
-                <input type="text" name="start_time" placeholder="14:00" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
+                <input type="time" name="start_time" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Xona (Auditoriya)</label>
-                <input type="text" name="room" placeholder="1-Xona" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm">
             </div>
-        </div>
 
         <div class="grid grid-cols-2 gap-3">
             <div>

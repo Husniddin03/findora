@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Group extends Model
 {
@@ -15,38 +16,44 @@ class Group extends Model
     protected $fillable = [
         'learning_center_id',
         'course_id',
+        'staff_id', // teacher_name o'rniga foreign key
         'name',
-        'teacher_name',
-        'days_type',
+        'days_type', // Masalan: odd, even, custom
         'start_time',
-        'room',
         'max_students',
         'status',
     ];
 
-    /**
-     * Guruh qaysi o'quv markaziga tegishli ekanligi
-     */
     public function learningCenter(): BelongsTo
     {
         return $this->belongsTo(LearningCenter::class);
     }
 
-    /**
-     * Guruh qaysi kurs (fan) yo'nalishi bo'yicha ochilganligi
-     */
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
     }
 
     /**
-     * Guruhdagi o'quvchilar ro'yxati (Many-to-Many munosabati uchun)
-     * (Eslatma: student_group pivot jadvali borligini nazarda tutadi)
+     * Guruhga biriktirilgan o'qituvchi (Xodim)
      */
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class, 'staff_id');
+    }
+
+    /**
+     * Guruhning dars jadvali setkasi
+     */
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
     public function students(): BelongsToMany
     {
-        // Agar o'quvchilar modeli nomi 'Student' bo'lsa
-        return $this->belongsToMany(Student::class, 'student_group');
+        return $this->belongsToMany(Student::class, 'student_group')
+                    ->withPivot('joined_at')
+                    ->withTimestamps();
     }
 }

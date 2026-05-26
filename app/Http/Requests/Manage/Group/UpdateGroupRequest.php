@@ -15,12 +15,11 @@ class UpdateGroupRequest extends FormRequest
     {
         return [
             'course_id' => 'required|exists:courses,id',
+            'staff_id' => 'required|exists:staff,id',
             'name' => 'required|string|max:255',
-            'teacher_name' => 'required|string|max:255',
             'days_type' => 'required|in:odd,even,custom',
-            'start_time' => 'required|string',
-            'room' => 'required|string|max:50',
-            'max_students' => 'required|integer|min:5|max:50',
+            'start_time' => 'required',
+            'max_students' => 'required|integer|min:1',
             'status' => 'required|in:collecting,active,finished',
         ];
     }

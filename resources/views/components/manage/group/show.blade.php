@@ -1,15 +1,37 @@
 <div>
     <div class="border-b pb-3 mb-4">
-        <span class="px-2 py-0.5 text-[10px] font-bold bg-indigo-50 text-indigo-700 rounded-md uppercase tracking-wider" x-text="selectedGroup.course.title"></span>
+        <span class="px-2 py-0.5 text-[10px] font-bold bg-indigo-50 text-indigo-700 rounded-md uppercase tracking-wider" x-text="selectedGroup.course ? selectedGroup.course.title : 'Kurs'"></span>
         <h3 class="text-xl font-bold text-gray-900 mt-1" x-text="selectedGroup.name"></h3>
     </div>
 
     <div class="space-y-3 text-sm text-gray-700 mb-6">
-        <div class="flex justify-between py-1 border-b border-gray-50"><span class="text-gray-400">Asosiy Ustoz:</span> <span class="font-semibold text-gray-800" x-text="selectedGroup.teacher_name"></span></div>
-        <div class="flex justify-between py-1 border-b border-gray-50"><span class="text-gray-400">Dars kunlari:</span> <span class="font-medium" x-text="selectedGroup.days_type == 'odd' ? 'Toq kunlari (Dsh-Chsh-Jm)' : (selectedGroup.days_type == 'even' ? 'Juft kunlari (Ssh-Ph-Sh)' : 'Boshqa kunlar')"></span></div>
-        <div class="flex justify-between py-1 border-b border-gray-50"><span class="text-gray-400">Dars vaqti va Xona:</span> <span class="font-medium" x-text="selectedGroup.start_time + ' • ' + selectedGroup.room"></span></div>
-        <div class="flex justify-between py-1 border-b border-gray-50"><span class="text-gray-400">Loyiha sig'imi:</span> <span class="font-medium" x-text="(selectedGroup.students_count || 0) + ' / ' + selectedGroup.max_students + ' ta o\'quvchi'"></span></div>
-        <div class="flex justify-between py-1"><span class="text-gray-400">Guruh holati:</span> <span class="px-2 py-0.5 rounded-md text-xs font-medium" :class="selectedGroup.status == 'active' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'" x-text="selectedGroup.status == 'active' ? 'Faol dars jarayonida' : 'O\'quvchilar yig\'ilmoqda'"></span></div>
+        <div class="flex justify-between py-1 border-b border-gray-50">
+            <span class="text-gray-400">Asosiy Ustoz:</span> 
+            <span class="font-semibold text-gray-800" x-text="selectedGroup.teacher ? selectedGroup.teacher.name : 'Tayyinlanmagan'"></span>
+        </div>
+        
+        <div class="flex justify-between py-1 border-b border-gray-50">
+            <span class="text-gray-400">Dars kunlari:</span> 
+            <span class="font-medium" x-text="selectedGroup.days_type == 'odd' ? 'Toq kunlari (Dsh-Chsh-Jm)' : (selectedGroup.days_type == 'even' ? 'Juft kunlari (Ssh-Ph-Sh)' : 'Boshqa kunlar')"></span>
+        </div>
+        
+        <div class="flex justify-between py-1 border-b border-gray-50">
+            <span class="text-gray-400">Dars vaqti:</span> 
+            <span class="font-medium" x-text="selectedGroup.start_time"></span>
+        </div>
+        
+        <div class="flex justify-between py-1 border-b border-gray-50">
+            <span class="text-gray-400">Loyiha sig'imi:</span> 
+            <span class="font-medium" x-text="(selectedGroup.students_count || 0) + ' / ' + selectedGroup.max_students + ' ta o\'quvchi'"></span>
+        </div>
+        
+        <div class="flex justify-between py-1">
+            <span class="text-gray-400">Guruh holati:</span> 
+            <span class="px-2 py-0.5 rounded-md text-xs font-medium" 
+                  :class="selectedGroup.status == 'active' ? 'bg-green-50 text-green-700' : (selectedGroup.status == 'collecting' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-700')" 
+                  x-text="selectedGroup.status == 'active' ? 'Faol dars jarayonida' : (selectedGroup.status == 'collecting' ? 'O\'quvchilar yig\'ilmoqda' : 'Guruh tugatilgan')">
+            </span>
+        </div>
     </div>
 
     <div class="flex items-center justify-between pt-3 border-t">

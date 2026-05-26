@@ -4,7 +4,7 @@
         openShowModal: false,
         openEditModal: false,
         openDeleteModal: false,
-        selectedGroup: { course: {} }
+        selectedGroup: { course: {}, teacher: {} }
     }" @keydown.escape.window="openCreateModal = false; openShowModal = false; openEditModal = false; openDeleteModal = false">
 
         @if(session('success'))
@@ -60,7 +60,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @forelse($groups as $group)
                 @php 
-                    $percent = ($group->students_count / $group->max_students) * 100;
+                    $percent = $group->max_students > 0 ? ($group->students_count / $group->max_students) * 100 : 0;
                 @endphp
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden">
                     <div class="p-5">
@@ -76,7 +76,7 @@
 
                         <h3 class="text-lg font-bold text-gray-900">{{ $group->name }}</h3>
                         <p class="text-xs text-gray-500 mt-1 flex items-center">
-                            <span class="mr-1">👨‍🏫</span> Ustoz: {{ $group->teacher_name }}
+                            <span class="mr-1">👨‍🏫</span> Ustoz: {{ $group->teacher->name ?? 'Tayyinlanmagan' }}
                         </p>
 
                         <div class="mt-4 grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl text-xs">
@@ -87,8 +87,8 @@
                                 </span>
                             </div>
                             <div>
-                                <span class="text-gray-400 block">Vaqti & Xona:</span>
-                                <span class="font-medium text-gray-800">{{ $group->start_time }} • {{ $group->room }}</span>
+                                <span class="text-gray-400 block">Dars vaqti:</span>
+                                <span class="font-medium text-gray-800">{{ $group->start_time }}</span>
                             </div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                             </div>
                         </div>
                         
-                        <button @click="selectedGroup = {{ json_encode($group->load('course')) }}; openShowModal = true"
+                        <button @click="selectedGroup = {{ json_encode($group->load(['course', 'teacher'])) }}; openShowModal = true"
                             class="text-xs font-medium text-indigo-600 bg-white border border-gray-200 px-3 py-1.5 rounded-xl shadow-sm hover:bg-gray-50 transition-colors">
                             Guruhni ko'rish
                         </button>
@@ -123,7 +123,7 @@
             <div @click="openCreateModal = false" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm"></div>
             <div class="flex min-h-full items-center justify-center p-4 text-center">
                 <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all w-full max-w-xl p-6">
-                    <x-manage.group.create :center="$center" :courses="$courses" />
+                    <x-manage.group.create :center="$center" :courses="$courses" :teachers="$teachers" />
                 </div>
             </div>
         </div>
@@ -141,7 +141,7 @@
             <div @click="openEditModal = false" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm"></div>
             <div class="flex min-h-full items-center justify-center p-4 text-center">
                 <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all w-full max-w-xl p-6">
-                    <x-manage.group.edit :courses="$courses" :center="$center" />
+                    <x-manage.group.edit :courses="$courses" :center="$center" :teachers="$teachers" />
                 </div>
             </div>
         </div>

@@ -4,6 +4,10 @@ namespace App\Models;
 
 use App\Models\Manage\Course;
 use App\Models\Manage\Group;
+use App\Models\Manage\Room;
+use App\Models\Manage\Schedule;
+use App\Models\Manage\ScheduleSession;
+use App\Models\Manage\Staff;
 use App\Models\Manage\Student;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,37 +19,12 @@ class LearningCenter extends Model
     use HasFactory;
 
     protected $fillable = [
-        'logo',
-        'name',
-        'slug',
-        'type',
-        'about',
-        'country',
-        'province',
-        'region',
-        'address',
-        'location',
-        'status',
-        'users_id',
-        'student_count',
-        'total_reyting',
-        'rating',
-        'ratings_total',
-        'checked',
-        'status',
-        'premium',
-        'premium_until',
-        'tin',
-        'legal_address',
-        'territory',
-        'license_number',
-        'license_registration_date',
-        'license_validity_period',
-        'manager_name',
-        'phone_number',
-        'email',
-        'ifut_code',
-        'active'
+        'logo', 'name', 'slug', 'type', 'about', 'country', 'province', 
+        'region', 'address', 'location', 'users_id', 'student_count', 
+        'total_reyting', 'rating', 'ratings_total', 'checked', 'status', 
+        'premium', 'premium_until', 'tin', 'legal_address', 'territory', 
+        'license_number', 'license_registration_date', 'license_validity_period', 
+        'manager_name', 'phone_number', 'email', 'ifut_code', 'active'
     ];
 
     protected $casts = [
@@ -65,17 +44,37 @@ class LearningCenter extends Model
 
     public function courses(): HasMany
     {
-        return $this->hasMany(Course::class);
+        return $this->hasMany(Course::class, 'learning_center_id');
     }
 
-    public function groups()
+    public function groups(): HasMany
     {
-        return $this->hasMany(Group::class);
+        return $this->hasMany(Group::class, 'learning_center_id');
     }
 
-    public function students()
+    public function students(): HasMany
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(Student::class, 'learning_center_id');
+    }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class, 'learning_center_id');
+    }
+
+    public function staff(): HasMany
+    {
+        return $this->hasMany(Staff::class, 'learning_center_id');
+    }
+
+    public function rooms()
+    {
+        return $this->hasMany(Room::class, 'learning_center_id');
+    }
+
+    public function scheduleSessions(): HasMany
+    {
+        return $this->hasMany(ScheduleSession::class, 'learning_center_id');
     }
 
     public function images()

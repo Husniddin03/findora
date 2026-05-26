@@ -13,11 +13,14 @@ class GroupController extends Controller
 {
     public function index(Request $request, LearningCenter $center)
     {
-        // Kurslarni filtr select uchun yuklaymiz
+        // Kurslarni yuklaymiz
         $courses = $center->courses()->get();
 
-        // Guruhlarni filtrlash query ob'ekti
-        $query = $center->groups()->with('course')->withCount('students');
+        // Faqat faol o'qituvchilarni guruh yaratish/tahrirlash selectlari uchun yuklaymiz
+        $teachers = $center->staff()->where('role', 'teacher')->where('status', 'active')->get();
+
+        // Guruhlarni o'qituvchisi (`teacher`) bilan birga yuklaymiz (Eager Loading)
+        $query = $center->groups()->with(['course', 'teacher'])->withCount('students');
 
         // Status bo'yicha filtr (default: active)
         $currentStatus = $request->get('status', 'active');
@@ -30,14 +33,14 @@ class GroupController extends Controller
 
         $groups = $query->latest()->get();
 
-        // Har bir statusdagi guruhlar sonini hisoblash (Tablar uchun)
+        // Har bir statusdagi guruhlar sonini hisoblash
         $counts = [
             'active' => $center->groups()->where('status', 'active')->count(),
             'collecting' => $center->groups()->where('status', 'collecting')->count(),
             'finished' => $center->groups()->where('status', 'finished')->count(),
         ];
 
-        return view("manage.groups.index", compact('center', 'courses', 'groups', 'counts', 'currentStatus'));
+        return view("manage.groups.index", compact('center', 'courses', 'teachers', 'groups', 'counts', 'currentStatus'));
     }
 
     public function store(StoreGroupRequest $request, LearningCenter $center)

@@ -9,6 +9,6 @@ class DashboardController extends Controller
 {
     public function index(LearningCenter $center)
     {
-        return view("manage.manage", compact("center"));
+        return view("manage.index", compact("center"));
     }
 }

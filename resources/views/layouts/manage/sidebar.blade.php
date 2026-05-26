@@ -52,8 +52,8 @@
                 jarayoni</span>
 
             <!-- O'quvchilar -->
-            <a href="{{ route('manage.teachers', $center->slug) }}"
-                class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('manage.teachers') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-100 transition-colors' }}">
+            <a href="{{ route('manage.students', $center->slug) }}"
+                class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('manage.students') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-100 transition-colors' }}">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
@@ -103,6 +103,16 @@
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Davomat jurnali
+            </a>
+
+            {{-- Xonalar --}}
+            <a href="{{ route('manage.rooms', $center->slug) }}"
+                class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('manage.rooms') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700 hover:bg-gray-100 transition-colors' }}">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 12h14M5 12H2m14 0h3m-9 3h10M5 9h10M5 15h10M2 12h20M2 9h20M2 15h20" />
+                </svg>
+                Xonalar
             </a>
         </div>
 

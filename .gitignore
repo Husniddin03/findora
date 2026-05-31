@@ -20,7 +20,7 @@
 /vendor
 Homestead.json
 Homestead.yaml
-Thumbs.db
+Thumbs.dbO
 
 # Database scripts
 database/__pycache__/

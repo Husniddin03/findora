@@ -45,6 +45,7 @@ Route::put('rooms/{center:slug}/{room}', [RoomController::class, 'update'])->nam
 Route::delete('rooms/{center:slug}/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
 
 Route::get('attendances/{center}', [AttendanceController::class, 'index'])->name('attendances');
+Route::post('attendances/{center}/store', [AttendanceController::class, 'storeOrUpdate'])->name('attendances.storeOrUpdate');
 
 Route::get('staff/{center:slug}', [StaffController::class, 'index'])->name('staff');
 Route::post('staff/{center:slug}', [StaffController::class, 'store'])->name('staff.store');

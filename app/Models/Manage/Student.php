@@ -37,4 +37,9 @@ class Student extends Model
                     ->withPivot('joined_at')
                     ->withTimestamps();
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }

@@ -178,7 +178,7 @@ Route::fallback(function () {
 });
 
 Route::get('setwebhook', function () {
-    $response = Telegram::setWebhook(['url' => 'https://obesely-squirrellike-byron.ngrok-free.dev/api/telegram/webhook']);
+    $response = Telegram::setWebhook(['url' => 'https://lcway.husniddin.com/api/telegram/webhook']);
     return $response;
 });
 

@@ -38,6 +38,8 @@ class DeployCommand extends Command
         $message = "auto deploy\n\nChanged files:\n- {$changedFiles}";
 
         $runGit('cd /home/husniddin/vscode/kurs-ishi/FindCourse');
+        $runGit('npm run build');
+
 
         $runGit('git add .');
         $runGit('git commit -m "' . addslashes($message) . '"');
